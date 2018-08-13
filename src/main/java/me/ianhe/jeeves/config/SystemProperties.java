@@ -4,6 +4,10 @@ package me.ianhe.jeeves.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author linhe2
+ * @since 2018/8/13 22:41
+ */
 @Component
 @ConfigurationProperties(prefix = "my.system")
 public class SystemProperties {

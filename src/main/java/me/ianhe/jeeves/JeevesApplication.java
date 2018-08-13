@@ -6,9 +6,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableScheduling
+/**
+ * @author linhe2
+ * @since 2018/8/13 22:42
+ */
 @SpringBootApplication
 public class JeevesApplication {
 
@@ -24,7 +26,6 @@ public class JeevesApplication {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 logger.error(e.getMessage(), e);
-//            System.exit(1);
             }
         });
         return new CommandLineRunner() {

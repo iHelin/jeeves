@@ -1,10 +1,7 @@
 package me.ianhe.jeeves.service;
 
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
-import me.ianhe.jeeves.domain.shared.Contact;
-import me.ianhe.jeeves.domain.shared.Owner;
-import me.ianhe.jeeves.domain.shared.SyncCheckKey;
-import me.ianhe.jeeves.domain.shared.SyncKey;
+import me.ianhe.jeeves.domain.shared.*;
 import me.ianhe.jeeves.utils.DeviceIdGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -175,11 +172,24 @@ public class CacheService {
     }
 
     public String getDisplayUserName(String userName) {
-        String name;
         for (Contact contact : individuals) {
             if (contact.getUserName().equals(userName)) {
-                name = StringUtils.isNotEmpty(contact.getRemarkName()) ? contact.getRemarkName() : contact.getNickName();
-                return name;
+                return StringUtils.isNotEmpty(contact.getRemarkName()) ? contact.getRemarkName() : contact.getNickName();
+            }
+        }
+        return null;
+    }
+
+    public String getDisplayChatRoomName(String chatRoomName, String userName) {
+        for (Contact contact : chatRooms) {
+            if (contact.getUserName().equals(chatRoomName)) {
+                Set<ChatRoomMember> memberList = contact.getMemberList();
+                for (ChatRoomMember chatRoomMember : memberList) {
+                    if (userName.equals(chatRoomMember.getUserName())) {
+                        return contact.getNickName() + "[" + chatRoomMember.getNickName() + "]";
+                    }
+                }
+                return contact.getNickName();
             }
         }
         return null;

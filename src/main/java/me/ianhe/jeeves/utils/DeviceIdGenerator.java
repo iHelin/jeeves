@@ -3,7 +3,7 @@ package me.ianhe.jeeves.utils;
 import java.util.Random;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/13 22:17
  */
 public class DeviceIdGenerator {

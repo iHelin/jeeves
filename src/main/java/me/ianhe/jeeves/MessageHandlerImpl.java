@@ -38,10 +38,17 @@ public class MessageHandlerImpl implements MessageHandler {
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
         logger.info("onReceivingChatRoomTextMessage");
-        logger.info("from chatroom: " + message.getFromUserName());
-        logger.info("from person: " + MessageUtils.getSenderOfChatRoomTextMessage(message.getContent()));
-        logger.info("to: " + message.getToUserName());
-        logger.info("content:" + MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+        logger.info("{}:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
+                MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+    }
+
+    @Override
+    public void onReceivingPrivateTextMessage(Message message) {
+        logger.info("onReceivingPrivateTextMessage");
+        logger.info("{}:{}", cacheService.getDisplayUserName(message.getFromUserName()), message.getContent());
+//        将原文回复给对方
+//        replyMessage(message);
     }
 
     @Override
@@ -50,6 +57,8 @@ public class MessageHandlerImpl implements MessageHandler {
         logger.info("thumbImageUrl:" + thumbImageUrl);
         logger.info("fullImageUrl:" + fullImageUrl);
         byte[] data = wechatHttpService.downloadImage(fullImageUrl);
+        logger.info("chatroom image:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
         qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
 
     }
@@ -61,15 +70,6 @@ public class MessageHandlerImpl implements MessageHandler {
         logger.info("fullImageUrl:" + fullImageUrl);
         byte[] data = wechatHttpService.downloadImage(fullImageUrl);
         qiniuStoreService.uploadFile("jeeves/private/" + UUID.randomUUID().toString(), data);
-    }
-
-    @Override
-    public void onReceivingPrivateTextMessage(Message message) {
-        logger.info("onReceivingPrivateTextMessage");
-        logger.info("from :{}", cacheService.getDisplayUserName(message.getFromUserName()));
-        logger.info("content:" + message.getContent());
-//        将原文回复给对方
-//        replyMessage(message);
     }
 
     @Override

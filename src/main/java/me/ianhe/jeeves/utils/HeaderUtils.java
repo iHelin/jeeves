@@ -3,7 +3,7 @@ package me.ianhe.jeeves.utils;
 import org.springframework.http.HttpHeaders;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/13 22:09
  */
 public class HeaderUtils {
