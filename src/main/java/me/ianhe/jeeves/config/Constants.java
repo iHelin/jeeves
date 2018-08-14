@@ -1,7 +1,7 @@
 package me.ianhe.jeeves.config;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/14 19:12
  */
 public class Constants {

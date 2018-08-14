@@ -1,7 +1,7 @@
 package me.ianhe.jeeves.utils;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/14 18:51
  */
 public class RandomUtils {

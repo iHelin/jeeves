@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/14 22:38
  */
 public class WeChatUtils {

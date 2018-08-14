@@ -1,7 +1,7 @@
 package me.ianhe.jeeves.enums;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/14 22:51
  */
 public enum MessageType {

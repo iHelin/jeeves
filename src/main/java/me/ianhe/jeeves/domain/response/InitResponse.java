@@ -11,7 +11,7 @@ import me.ianhe.jeeves.domain.shared.SyncKey;
 import java.util.Set;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/14 18:57
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

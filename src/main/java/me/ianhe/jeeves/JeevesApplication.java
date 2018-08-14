@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/13 22:42
  */
 @SpringBootApplication
