@@ -61,7 +61,7 @@ public class QRCodeUtils {
         StringBuilder builder = new StringBuilder();
         for (int r = 0; r < bitMatrix.getHeight(); r++) {
             for (int c = 0; c < bitMatrix.getWidth(); c++) {
-                if (!bitMatrix.get(r, c)) {
+                if (bitMatrix.get(r, c)) {
                     builder.append("\033[47m  \033[0m");
                 } else {
                     builder.append("\033[40m  \033[0m");

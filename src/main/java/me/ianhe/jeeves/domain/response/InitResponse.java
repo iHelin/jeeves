@@ -10,9 +10,13 @@ import me.ianhe.jeeves.domain.shared.SyncKey;
 
 import java.util.Set;
 
+/**
+ * @author linhe2
+ * @since 2018/8/14 18:57
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InitResponse extends AbstractWeChatHttpResponseBase {
-    @JsonProperty
+    @JsonProperty("Count")
     private int Count;
     @JsonProperty
     private Set<Contact> ContactList;

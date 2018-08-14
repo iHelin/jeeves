@@ -1,36 +1,45 @@
 package me.ianhe.jeeves.domain.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.StatReport;
 
+/**
+ * @author linhe2
+ * @since 2018/8/14 20:31
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatReportRequest {
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
-    private int Count;
-    private StatReport[] List;
+
+    @JsonProperty("BaseRequest")
+    private BaseRequest baseRequest;
+    @JsonProperty("Count")
+    private int count;
+    @JsonProperty("List")
+    private StatReport[] list;
 
     public BaseRequest getBaseRequest() {
-        return BaseRequest;
+        return baseRequest;
     }
 
     public void setBaseRequest(BaseRequest baseRequest) {
-        BaseRequest = baseRequest;
+        this.baseRequest = baseRequest;
     }
 
     public int getCount() {
-        return Count;
+        return count;
     }
 
     public void setCount(int count) {
-        Count = count;
+        this.count = count;
     }
 
     public StatReport[] getList() {
-        return List;
+        return list;
     }
 
     public void setList(StatReport[] list) {
-        List = list;
+        this.list = list;
     }
 }

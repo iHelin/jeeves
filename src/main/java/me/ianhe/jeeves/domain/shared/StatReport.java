@@ -1,25 +1,33 @@
 package me.ianhe.jeeves.domain.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author linhe2
+ * @since 2018/8/14 20:34
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatReport {
-    private String Text;
-    private int Type;
+
+    @JsonProperty("Text")
+    private String text;
+    @JsonProperty("Type")
+    private int type;
 
     public String getText() {
-        return Text;
+        return text;
     }
 
     public void setText(String text) {
-        Text = text;
+        this.text = text;
     }
 
     public int getType() {
-        return Type;
+        return type;
     }
 
     public void setType(int type) {
-        Type = type;
+        this.type = type;
     }
 }

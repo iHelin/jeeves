@@ -6,7 +6,9 @@ import me.ianhe.jeeves.utils.DeviceIdGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -47,6 +49,8 @@ public class CacheService {
     private Set<Contact> individuals = new HashSet<>();
     private Set<Contact> mediaPlatforms = new HashSet<>();
     private Set<Contact> chatRooms = new HashSet<>();
+
+    private Map<String, Member> allMembers = new HashMap<>();
 
     private Set<String> contactNamesWithUnreadMessage = new HashSet<>();
 
@@ -169,6 +173,14 @@ public class CacheService {
 
     public Set<String> getContactNamesWithUnreadMessage() {
         return contactNamesWithUnreadMessage;
+    }
+
+    public Map<String, Member> getAllMembers() {
+        return allMembers;
+    }
+
+    public void setAllMembers(Map<String, Member> allMembers) {
+        this.allMembers = allMembers;
     }
 
     public String getDisplayUserName(String userName) {

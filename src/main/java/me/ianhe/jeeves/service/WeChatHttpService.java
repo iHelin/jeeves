@@ -5,7 +5,7 @@ import me.ianhe.jeeves.domain.shared.ChatRoomDescription;
 import me.ianhe.jeeves.domain.shared.Contact;
 import me.ianhe.jeeves.enums.StatusNotifyCode;
 import me.ianhe.jeeves.exception.WechatException;
-import me.ianhe.jeeves.utils.WechatUtils;
+import me.ianhe.jeeves.utils.WeChatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class WeChatHttpService {
         long seq = 0;
         do {
             GetContactResponse response = wechatHttpServiceInternal.getContact(cacheService.getHostUrl(), cacheService.getsKey(), seq);
-            WechatUtils.checkBaseResponse(response);
+            WeChatUtils.checkBaseResponse(response);
             seq = response.getSeq();
             contacts.addAll(response.getMemberList());
         }
@@ -67,7 +67,7 @@ public class WeChatHttpService {
         if (!userName.equals(cacheService.getOwner().getUserName())) {
             notifyNecessary(userName);
             SendMsgResponse response = wechatHttpServiceInternal.sendText(cacheService.getHostUrl(), cacheService.getBaseRequest(), content, cacheService.getOwner().getUserName(), userName);
-            WechatUtils.checkBaseResponse(response);
+            WeChatUtils.checkBaseResponse(response);
         } else {
             logger.warn("不能发送给自己");
         }
@@ -82,7 +82,7 @@ public class WeChatHttpService {
      */
     public void setAlias(String userName, String newAlias) throws IOException {
         OpLogResponse response = wechatHttpServiceInternal.setAlias(cacheService.getHostUrl(), cacheService.getBaseRequest(), newAlias, userName);
-        WechatUtils.checkBaseResponse(response);
+        WeChatUtils.checkBaseResponse(response);
     }
 
     /**
@@ -100,7 +100,7 @@ public class WeChatHttpService {
                     return description;
                 }).toArray(ChatRoomDescription[]::new);
         BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(cacheService.getHostUrl(), cacheService.getBaseRequest(), descriptions);
-        WechatUtils.checkBaseResponse(response);
+        WeChatUtils.checkBaseResponse(response);
         return response.getContactList();
     }
 
@@ -114,13 +114,13 @@ public class WeChatHttpService {
      */
     public void createChatRoom(String[] userNames, String topic) throws IOException {
         CreateChatRoomResponse response = wechatHttpServiceInternal.createChatRoom(cacheService.getHostUrl(), cacheService.getBaseRequest(), userNames, topic);
-        WechatUtils.checkBaseResponse(response);
+        WeChatUtils.checkBaseResponse(response);
         //invoke BatchGetContact after CreateChatRoom
         ChatRoomDescription description = new ChatRoomDescription();
         description.setUserName(response.getChatRoomName());
         ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
         BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(cacheService.getHostUrl(), cacheService.getBaseRequest(), descriptions);
-        WechatUtils.checkBaseResponse(batchGetContactResponse);
+        WeChatUtils.checkBaseResponse(batchGetContactResponse);
         cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
     }
 
@@ -133,7 +133,7 @@ public class WeChatHttpService {
      */
     public void deleteChatRoomMember(String chatRoomUserName, String userName) throws IOException {
         DeleteChatRoomMemberResponse response = wechatHttpServiceInternal.deleteChatRoomMember(cacheService.getHostUrl(), cacheService.getBaseRequest(), chatRoomUserName, userName);
-        WechatUtils.checkBaseResponse(response);
+        WeChatUtils.checkBaseResponse(response);
     }
 
     /**
@@ -145,7 +145,7 @@ public class WeChatHttpService {
      */
     public void addChatRoomMember(String chatRoomUserName, String userName) throws IOException {
         AddChatRoomMemberResponse response = wechatHttpServiceInternal.addChatRoomMember(cacheService.getHostUrl(), cacheService.getBaseRequest(), chatRoomUserName, userName);
-        WechatUtils.checkBaseResponse(response);
+        WeChatUtils.checkBaseResponse(response);
         Contact chatRoom = cacheService.getChatRooms().stream().filter(x -> chatRoomUserName.equals(x.getUserName())).findFirst().orElse(null);
         if (chatRoom == null) {
             throw new WechatException("can't find " + chatRoomUserName);

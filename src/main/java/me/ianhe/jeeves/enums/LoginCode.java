@@ -1,5 +1,9 @@
 package me.ianhe.jeeves.enums;
 
+/**
+ * @author linhe2
+ * @since 2018/8/14 20:48
+ */
 public enum LoginCode {
 
     /**

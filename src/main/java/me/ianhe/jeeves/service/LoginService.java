@@ -4,13 +4,14 @@ import com.google.zxing.WriterException;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.response.*;
 import me.ianhe.jeeves.domain.shared.ChatRoomDescription;
+import me.ianhe.jeeves.domain.shared.Contact;
 import me.ianhe.jeeves.domain.shared.Token;
 import me.ianhe.jeeves.enums.LoginCode;
 import me.ianhe.jeeves.enums.StatusNotifyCode;
 import me.ianhe.jeeves.exception.WechatException;
 import me.ianhe.jeeves.exception.WechatQRExpiredException;
 import me.ianhe.jeeves.utils.QRCodeUtils;
-import me.ianhe.jeeves.utils.WechatUtils;
+import me.ianhe.jeeves.utils.WeChatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,7 +31,7 @@ public class LoginService {
     @Autowired
     private CacheService cacheService;
     @Autowired
-    private SyncServie syncServie;
+    private SyncService syncService;
     @Autowired
     private WeChatHttpServiceInternal wechatHttpServiceInternal;
 
@@ -42,16 +44,17 @@ public class LoginService {
     private int qrRefreshTimes = 0;
 
     public void login() {
+        wechatHttpServiceInternal.open(qrRefreshTimes);
+        logger.info("[0] entry completed");
         cacheService.reset();
+        loginLoop();
+    }
+
+    private void loginLoop() {
         try {
-            //0 入口
-            wechatHttpServiceInternal.open(qrRefreshTimes);
-            logger.info("[0] entry completed");
-            //1 获取uuid
             String uuid = wechatHttpServiceInternal.getUUID();
             cacheService.setUuid(uuid);
-            logger.info("[1] uuid completed,is {}", uuid);
-            //2 获取二维码
+            logger.info("[1] uuid: {}", uuid);
             byte[] qrData = wechatHttpServiceInternal.getQR(uuid);
             ByteArrayInputStream stream = new ByteArrayInputStream(qrData);
             String qrUrl = QRCodeUtils.decode(stream, uuid);
@@ -59,10 +62,8 @@ public class LoginService {
             String qr = QRCodeUtils.generateQR(qrUrl, 10, 10);
             logger.info("\r\n" + qr);
             logger.info("[2] qrcode completed");
-            //3 statreport
             wechatHttpServiceInternal.statReport();
             logger.info("[3] statReport completed");
-            //4 login
             LoginResult loginResponse;
             while (true) {
                 loginResponse = wechatHttpServiceInternal.login(uuid);
@@ -115,7 +116,7 @@ public class LoginService {
             logger.info("[6] redirect completed");
             //7 init
             InitResponse initResponse = wechatHttpServiceInternal.init(cacheService.getHostUrl(), cacheService.getBaseRequest());
-            WechatUtils.checkBaseResponse(initResponse);
+            WeChatUtils.checkBaseResponse(initResponse);
             cacheService.setSyncKey(initResponse.getSyncKey());
             cacheService.setOwner(initResponse.getUser());
             logger.info("[7] init completed");
@@ -124,23 +125,27 @@ public class LoginService {
                     wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(),
                             cacheService.getBaseRequest(),
                             cacheService.getOwner().getUserName(), StatusNotifyCode.INITED.getCode());
-            WechatUtils.checkBaseResponse(statusNotifyResponse);
+            WeChatUtils.checkBaseResponse(statusNotifyResponse);
             logger.info("[8] status notify completed");
             //9 获取联系人
             long seq = 0;
             do {
                 GetContactResponse getContactResponse = wechatHttpServiceInternal.getContact(cacheService.getHostUrl(), cacheService.getBaseRequest().getSkey(), seq);
-                WechatUtils.checkBaseResponse(getContactResponse);
+                WeChatUtils.checkBaseResponse(getContactResponse);
                 logger.info("[*] getContactResponse seq = " + getContactResponse.getSeq());
                 logger.info("[*] getContactResponse memberCount = " + getContactResponse.getMemberCount());
                 seq = getContactResponse.getSeq();
-                cacheService.getIndividuals().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isIndividual).collect(Collectors.toSet()));
-                cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isMediaPlatform).collect(Collectors.toSet()));
+                Set<Contact> members = getContactResponse.getMemberList();
+                for (Contact member : members) {
+                    cacheService.getAllMembers().put(member.getUserName(), member);
+                }
+                cacheService.getIndividuals().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isIndividual).collect(Collectors.toSet()));
+                cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isMediaPlatform).collect(Collectors.toSet()));
             } while (seq > 0);
             logger.info("[9] get contact completed");
             //10 batch get contact
             ChatRoomDescription[] chatRoomDescriptions = initResponse.getContactList().stream()
-                    .filter(x -> x != null && WechatUtils.isChatRoom(x))
+                    .filter(x -> x != null && WeChatUtils.isChatRoom(x))
                     .map(x -> {
                         ChatRoomDescription description = new ChatRoomDescription();
                         description.setUserName(x.getUserName());
@@ -152,7 +157,7 @@ public class LoginService {
                         cacheService.getHostUrl(),
                         cacheService.getBaseRequest(),
                         chatRoomDescriptions);
-                WechatUtils.checkBaseResponse(batchGetContactResponse);
+                WeChatUtils.checkBaseResponse(batchGetContactResponse);
                 logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
                 cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
             }
@@ -161,13 +166,15 @@ public class LoginService {
             logger.info("[*] login process completed");
             logger.info("[*] start listening");
             while (true) {
-                syncServie.listen();
+                syncService.listen();
             }
         } catch (IOException | WriterException | URISyntaxException ex) {
             throw new WechatException(ex);
         } catch (WechatQRExpiredException ex) {
             if (AUTO_RELOGIN_WHEN_QRCODE_EXPIRED && qrRefreshTimes <= MAX_QR_REFRESH_TIMES) {
-                login();
+                qrRefreshTimes++;
+                cacheService.reset();
+                loginLoop();
             } else {
                 throw new WechatException(ex);
             }
