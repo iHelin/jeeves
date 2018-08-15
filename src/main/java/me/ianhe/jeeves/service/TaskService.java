@@ -54,7 +54,7 @@ public class TaskService {
      */
     @Scheduled(cron = "0/10 * * * * ?")
     public void runEveryDay0() {
-        sendMenu();
+//        sendMenu();
     }
 
     /**
