@@ -1,5 +1,9 @@
 package me.ianhe.jeeves.exception;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 22:09
+ */
 public class WechatQRExpiredException extends RuntimeException {
     public WechatQRExpiredException() {
     }

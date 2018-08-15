@@ -1,6 +1,5 @@
 package me.ianhe.jeeves.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import me.ianhe.jeeves.config.SystemProperties;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
@@ -23,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author iHelin
@@ -139,11 +137,20 @@ public class LoginService {
                 seq = getContactResponse.getSeq();
                 Set<Contact> members = getContactResponse.getMemberList();
                 for (Contact member : members) {
-                    cacheService.getAllMembers().put(member.getUserName(), member);
+                    cacheService.getAllMembers().add(member);
+                    if (WeChatUtils.isIndividual(member)) {
+                        cacheService.getIndividuals().add(member);
+                    }
+                    if (WeChatUtils.isChatRoom(member)) {
+                        cacheService.getChatRooms().add(member);
+                    }
+                    if (WeChatUtils.isMediaPlatform(member)) {
+                        cacheService.getMediaPlatforms().add(member);
+                    }
                 }
-                System.out.println(new ObjectMapper().writeValueAsString(members));
-                cacheService.getIndividuals().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isIndividual).collect(Collectors.toSet()));
-                cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isMediaPlatform).collect(Collectors.toSet()));
+//                cacheService.getIndividuals().addAll(members.stream().filter(WeChatUtils::isIndividual).collect(Collectors.toSet()));
+//                cacheService.getChatRooms().addAll(members.stream().filter(WeChatUtils::isChatRoom).collect(Collectors.toSet()));
+//                cacheService.getMediaPlatforms().addAll(members.stream().filter(WeChatUtils::isMediaPlatform).collect(Collectors.toSet()));
             } while (seq > 0);
             logger.info("[9] get contact completed");
             //10 batch get contact
@@ -162,7 +169,11 @@ public class LoginService {
                         chatRoomDescriptions);
                 WeChatUtils.checkBaseResponse(batchGetContactResponse);
                 logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-                cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
+                Set<Contact> contactList = batchGetContactResponse.getContactList();
+                for (Contact contact : contactList) {
+                    cacheService.getChatRooms().add(contact);
+                    cacheService.getAllMembers().add(contact);
+                }
             }
             logger.info("[10] batch get contact completed");
             cacheService.setAlive(true);

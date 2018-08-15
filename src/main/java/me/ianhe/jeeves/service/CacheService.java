@@ -6,9 +6,7 @@ import me.ianhe.jeeves.utils.WeChatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -49,8 +47,7 @@ public class CacheService {
     private Set<Contact> individuals = new HashSet<>();
     private Set<Contact> mediaPlatforms = new HashSet<>();
     private Set<Contact> chatRooms = new HashSet<>();
-
-    private Map<String, Member> allMembers = new HashMap<>();
+    private Set<Contact> allMembers = new HashSet<>();
 
     private Set<String> contactNamesWithUnreadMessage = new HashSet<>();
 
@@ -175,11 +172,11 @@ public class CacheService {
         return contactNamesWithUnreadMessage;
     }
 
-    public Map<String, Member> getAllMembers() {
+    public Set<Contact> getAllMembers() {
         return allMembers;
     }
 
-    public void setAllMembers(Map<String, Member> allMembers) {
+    public void setAllMembers(Set<Contact> allMembers) {
         this.allMembers = allMembers;
     }
 
@@ -192,10 +189,19 @@ public class CacheService {
         return null;
     }
 
-    public String getUserNameByNickName(String nickName){
-        for (Contact contact : individuals) {
+    public String getUserNameByNickName(String nickName) {
+        for (Contact contact : allMembers) {
             if (contact.getNickName().equals(nickName)) {
                 return contact.getUserName();
+            }
+        }
+        return null;
+    }
+
+    public String getDisplayChatRoomName(String chatRoomName) {
+        for (Contact contact : chatRooms) {
+            if (contact.getUserName().equals(chatRoomName)) {
+                return contact.getNickName();
             }
         }
         return null;

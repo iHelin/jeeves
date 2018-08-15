@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/15 20:38
  */
 @JacksonXmlRootElement(localName = "msg")

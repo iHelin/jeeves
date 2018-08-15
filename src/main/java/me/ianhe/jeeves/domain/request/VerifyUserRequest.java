@@ -6,7 +6,7 @@ import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.VerifyUser;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/15 20:29
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,21 +1,28 @@
 package me.ianhe.jeeves.service;
 
+import me.ianhe.jeeves.config.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/15 12:48
  */
 @Service
 public class TaskService {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CacheService cacheService;
@@ -26,8 +33,16 @@ public class TaskService {
     /**
      * 工作日11点执行
      */
-    @Scheduled(cron = "0 0 6 ? * MON-FRI")
-    public void runEveryDay6() throws IOException {
+    @Scheduled(cron = "0 0 11 ? * MON-FRI")
+    public void runEveryDay11() throws IOException {
+        sendMenu();
+    }
+
+    /**
+     * 工作日18点执行
+     */
+    @Scheduled(cron = "0 0 18 ? * MON-FRI")
+    public void runEveryDay18() throws IOException {
         daka();
     }
 
@@ -39,19 +54,38 @@ public class TaskService {
      */
     @Scheduled(cron = "0/10 * * * * ?")
     public void runEveryDay0() {
-        logger.debug("我每隔10秒出现一次");
-//        daka();
+        sendMenu();
     }
 
+    /**
+     * 打卡提醒
+     */
     private void daka() {
         if (cacheService.isAlive()) {
             logger.debug("打卡提醒");
-            String nickName = "下辈子一定要做只猪";
-            String userName = cacheService.getUserNameByNickName(nickName);
-            try {
-                weChatHttpService.sendText(userName, "下班了，注意别忘了打卡哦！");
-            } catch (IOException e) {
-                logger.error("提醒打卡失败。", e);
+            String userName = cacheService.getUserNameByNickName(Constants.DEST_CHATROOM_NAME);
+            weChatHttpService.sendText(userName, "美丽的小姐姐，到打卡时间了，别忘记打卡呦！");
+        }
+    }
+
+    /**
+     * 吃饭提醒
+     */
+    private void sendMenu() {
+        HashMap map = new RestTemplate().getForObject("https://dev.fluttercn.com/now-eat/menu-0620.json", HashMap.class);
+        List<String> workDate = (List<String>) map.get("workDate");
+        String currentDateStr = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+        for (String aWorkDate : workDate) {
+            if (currentDateStr.equals(aWorkDate)) {
+                List<Map> timeplan = (List<Map>) map.get("timeplan");
+                String mealTime = "";
+                for (Map tp : timeplan) {
+                    if (((String) tp.get("key")).contains("B")) {
+                        mealTime = (String) tp.get("value");
+                    }
+                }
+                String userName = cacheService.getUserNameByNickName(Constants.DEST_CHATROOM_NAME);
+                weChatHttpService.sendText(userName, "本周吃饭时间：" + mealTime);
             }
         }
     }

@@ -166,10 +166,8 @@ public class SyncService {
                         logger.info("[*] you've declined the invitation");
                     }
                 } else if (message.getMsgType() == MessageType.APP.getCode()) {
-                    logger.info("link 消息");
-                    logger.info(message.getFileName());
-                    logger.info(message.getContent());
-                    logger.info(message.getUrl());
+                    logger.info("app || link 消息");
+                    messageHandler.onReceiveAppMsg(message);
                 } else if (message.getMsgType() == MessageType.TAPEVENT.getCode()) {
                     logger.info("tap msg");
                 } else if (message.getMsgType() == MessageType.VOICE.getCode()) {

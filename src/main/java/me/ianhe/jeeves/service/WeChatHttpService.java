@@ -34,11 +34,11 @@ public class WeChatHttpService {
      *
      * @param userName the username of the contact
      * @param content  the content of text
-     * @throws IOException if sendText fails
      */
-    public void sendText(String userName, String content) throws IOException {
+    public void sendText(String userName, String content) {
         if (StringUtils.isNotEmpty(userName)) {
             if (!userName.equals(cacheService.getOwner().getUserName())) {
+                WeChatUtils.sleep();
                 notifyNecessary(userName);
                 SendMsgResponse response = wechatHttpServiceInternal.sendText(cacheService.getHostUrl(), cacheService.getBaseRequest(), content, cacheService.getOwner().getUserName(), userName);
                 WeChatUtils.checkBaseResponse(response);
@@ -125,13 +125,17 @@ public class WeChatHttpService {
      * @param userName the contact with whom I need to set the messages read.
      * @throws IOException if statusNotify fails.
      */
-    private void notifyNecessary(String userName) throws IOException {
+    private void notifyNecessary(String userName) {
         if (userName == null) {
             throw new IllegalArgumentException("userName");
         }
         Set<String> unreadContacts = cacheService.getContactNamesWithUnreadMessage();
         if (unreadContacts.contains(userName)) {
-            wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(), cacheService.getBaseRequest(), userName, StatusNotifyCode.READED.getCode());
+            try {
+                wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(), cacheService.getBaseRequest(), userName, StatusNotifyCode.READED.getCode());
+            } catch (IOException e) {
+                logger.error("notifyNecessary error", e);
+            }
             unreadContacts.remove(userName);
         }
     }

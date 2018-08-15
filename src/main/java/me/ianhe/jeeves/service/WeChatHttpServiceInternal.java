@@ -483,7 +483,7 @@ class WeChatHttpServiceInternal {
         return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), VerifyUserResponse.class);
     }
 
-    public SendMsgResponse sendText(String hostUrl, BaseRequest baseRequest, String content, String fromUserName, String toUserName) throws IOException {
+    public SendMsgResponse sendText(String hostUrl, BaseRequest baseRequest, String content, String fromUserName, String toUserName) {
         final int scene = 0;
         final String rnd = String.valueOf(System.currentTimeMillis() * 10);
         String passTicket = cacheService.getPassTicket();
@@ -503,7 +503,13 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
+        SendMsgResponse sendMsgResponse = null;
+        try {
+            sendMsgResponse = jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
+        } catch (IOException e) {
+            logger.error("发送消息失败。", e);
+        }
+        return sendMsgResponse;
     }
 
     public OpLogResponse setAlias(String hostUrl, BaseRequest baseRequest, String newAlias, String userName) throws IOException {

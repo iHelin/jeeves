@@ -113,4 +113,12 @@ public interface MessageHandler {
      * @param contact 发红包的个人或者群
      */
     void onRedPacketReceived(Contact contact);
+
+    /**
+     * 收到链接消息等
+     *
+     * @param message
+     */
+    void onReceiveAppMsg(Message message);
+
 }

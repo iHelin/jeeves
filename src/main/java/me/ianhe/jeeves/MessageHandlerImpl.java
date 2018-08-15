@@ -2,6 +2,7 @@ package me.ianhe.jeeves;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import me.ianhe.jeeves.config.Constants;
 import me.ianhe.jeeves.domain.shared.*;
 import me.ianhe.jeeves.service.CacheService;
 import me.ianhe.jeeves.service.MessageHandler;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -150,4 +153,17 @@ public class MessageHandlerImpl implements MessageHandler {
         }
     }
 
+    @Override
+    public void onReceiveAppMsg(Message message) {
+        logger.info(message.getFileName());
+        Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
+        if (matcher.find()) {
+            logger.info("{},{}", matcher.group(1), matcher.group(2));
+            String userName = cacheService.getUserNameByNickName(Constants.DEST_CHATROOM_NAME);
+            wechatHttpService.sendText(userName, "骚年，加油哦！");
+        }
+        logger.info(cacheService.getDisplayChatRoomName(message.getFromUserName(), MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
+        logger.info(StringEscapeUtils.unescapeXml(message.getContent()));
+        logger.info(message.getUrl());
+    }
 }

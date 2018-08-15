@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/15 20:27
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
