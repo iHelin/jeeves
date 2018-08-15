@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:27
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatusNotifyRequest {
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private String ClientMsgId;
     @JsonProperty

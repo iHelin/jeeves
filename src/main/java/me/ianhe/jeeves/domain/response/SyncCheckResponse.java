@@ -3,6 +3,10 @@ package me.ianhe.jeeves.domain.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:47
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncCheckResponse {
     @JsonProperty

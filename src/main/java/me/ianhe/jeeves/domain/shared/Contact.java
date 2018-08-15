@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Set;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:36
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Contact extends Member {
     @JsonProperty
@@ -150,12 +154,8 @@ public class Contact extends Member {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Contact contact = (Contact) o;
         return this.getUserName().equals(contact.getUserName());
     }

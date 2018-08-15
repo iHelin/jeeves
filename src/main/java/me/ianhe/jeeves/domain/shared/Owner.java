@@ -3,6 +3,10 @@ package me.ianhe.jeeves.domain.shared;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:39
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Owner extends Member {
     @JsonProperty

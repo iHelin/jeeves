@@ -9,45 +9,44 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseRequest {
-
-    @JsonProperty("Uin")
-    private String uin;
-    @JsonProperty("Sid")
-    private String sid;
-    @JsonProperty("Skey")
-    private String sKey;
-    @JsonProperty("DeviceID")
-    private String deviceID;
+    @JsonProperty
+    private String Uin;
+    @JsonProperty
+    private String Sid;
+    @JsonProperty
+    private String Skey;
+    @JsonProperty
+    private String DeviceID;
 
     public String getUin() {
-        return uin;
+        return Uin;
     }
 
     public void setUin(String uin) {
-        this.uin = uin;
+        Uin = uin;
     }
 
     public String getSid() {
-        return sid;
+        return Sid;
     }
 
     public void setSid(String sid) {
-        this.sid = sid;
+        Sid = sid;
     }
 
     public String getSkey() {
-        return sKey;
+        return Skey;
     }
 
-    public void setSkey(String sKey) {
-        this.sKey = sKey;
+    public void setSkey(String skey) {
+        Skey = skey;
     }
 
     public String getDeviceID() {
-        return deviceID;
+        return DeviceID;
     }
 
     public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
+        DeviceID = deviceID;
     }
 }

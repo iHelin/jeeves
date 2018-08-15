@@ -4,8 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.response.component.AbstractWeChatHttpResponseBase;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:43
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatusNotifyResponse extends AbstractWeChatHttpResponseBase {
+
     @JsonProperty
     private String MsgID;
 

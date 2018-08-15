@@ -1,15 +1,18 @@
 package me.ianhe.jeeves.domain.request;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.ChatRoomMember;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:25
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateChatRoomRequest {
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private int MemberCount;
     @JsonProperty

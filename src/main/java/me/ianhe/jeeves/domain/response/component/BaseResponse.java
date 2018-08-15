@@ -2,6 +2,10 @@ package me.ianhe.jeeves.domain.response.component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:53
+ */
 public class BaseResponse {
     @JsonProperty
     private int Ret;

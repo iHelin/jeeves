@@ -16,7 +16,8 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InitResponse extends AbstractWeChatHttpResponseBase {
-    @JsonProperty("Count")
+
+    @JsonProperty
     private int Count;
     @JsonProperty
     private Set<Contact> ContactList;

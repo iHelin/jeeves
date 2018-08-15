@@ -7,8 +7,13 @@ import me.ianhe.jeeves.domain.shared.Contact;
 
 import java.util.Set;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:04
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GetContactResponse extends AbstractWeChatHttpResponseBase {
+
     @JsonProperty
     private int MemberCount;
     @JsonProperty

@@ -1,7 +1,6 @@
 package me.ianhe.jeeves.domain.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.StatReport;
 
@@ -11,35 +10,31 @@ import me.ianhe.jeeves.domain.shared.StatReport;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatReportRequest {
-
-    @JsonProperty("BaseRequest")
-    private BaseRequest baseRequest;
-    @JsonProperty("Count")
-    private int count;
-    @JsonProperty("List")
-    private StatReport[] list;
+    private BaseRequest BaseRequest;
+    private int Count;
+    private StatReport[] List;
 
     public BaseRequest getBaseRequest() {
-        return baseRequest;
+        return BaseRequest;
     }
 
     public void setBaseRequest(BaseRequest baseRequest) {
-        this.baseRequest = baseRequest;
+        BaseRequest = baseRequest;
     }
 
     public int getCount() {
-        return count;
+        return Count;
     }
 
     public void setCount(int count) {
-        this.count = count;
+        Count = count;
     }
 
     public StatReport[] getList() {
-        return list;
+        return List;
     }
 
     public void setList(StatReport[] list) {
-        this.list = list;
+        List = list;
     }
 }

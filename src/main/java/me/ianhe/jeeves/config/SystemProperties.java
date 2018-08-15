@@ -9,16 +9,44 @@ import org.springframework.stereotype.Component;
  * @since 2018/8/13 22:41
  */
 @Component
-@ConfigurationProperties(prefix = "my.system")
+@ConfigurationProperties(prefix = "jeeves")
 public class SystemProperties {
 
     /**
      * 七牛存储
      */
+    private String instanceId;
+    private Boolean autoReLogin;
+    private Integer maxQrRefreshTimes;
     private String qnAccessKey;
     private String qnSecretKey;
     private String qnPrefix;
     private String qnBucket;
+    private Boolean ide;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public Boolean getAutoReLogin() {
+        return autoReLogin;
+    }
+
+    public void setAutoReLogin(Boolean autoReLogin) {
+        this.autoReLogin = autoReLogin;
+    }
+
+    public Integer getMaxQrRefreshTimes() {
+        return maxQrRefreshTimes;
+    }
+
+    public void setMaxQrRefreshTimes(Integer maxQrRefreshTimes) {
+        this.maxQrRefreshTimes = maxQrRefreshTimes;
+    }
 
     public String getQnAccessKey() {
         return qnAccessKey;
@@ -50,5 +78,13 @@ public class SystemProperties {
 
     public void setQnBucket(String qnBucket) {
         this.qnBucket = qnBucket;
+    }
+
+    public Boolean getIde() {
+        return ide;
+    }
+
+    public void setIde(Boolean ide) {
+        this.ide = ide;
     }
 }

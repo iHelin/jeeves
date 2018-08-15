@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.ChatRoomDescription;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:23
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatchGetContactRequest {
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private int Count;
     @JsonProperty

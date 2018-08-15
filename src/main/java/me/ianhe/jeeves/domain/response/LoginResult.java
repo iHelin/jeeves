@@ -1,5 +1,9 @@
 package me.ianhe.jeeves.domain.response;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:46
+ */
 public class LoginResult {
     private String code;
     private String redirectUrl;

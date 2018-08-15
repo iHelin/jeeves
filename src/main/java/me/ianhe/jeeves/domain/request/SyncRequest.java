@@ -12,7 +12,7 @@ import me.ianhe.jeeves.domain.shared.SyncKey;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncRequest {
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private long rr;
     @JsonProperty

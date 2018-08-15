@@ -1,6 +1,8 @@
 package me.ianhe.jeeves.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
+import me.ianhe.jeeves.config.SystemProperties;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.response.*;
 import me.ianhe.jeeves.domain.shared.ChatRoomDescription;
@@ -8,14 +10,13 @@ import me.ianhe.jeeves.domain.shared.Contact;
 import me.ianhe.jeeves.domain.shared.Token;
 import me.ianhe.jeeves.enums.LoginCode;
 import me.ianhe.jeeves.enums.StatusNotifyCode;
-import me.ianhe.jeeves.exception.WechatException;
+import me.ianhe.jeeves.exception.WeChatException;
 import me.ianhe.jeeves.exception.WechatQRExpiredException;
 import me.ianhe.jeeves.utils.QRCodeUtils;
 import me.ianhe.jeeves.utils.WeChatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -24,22 +25,23 @@ import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 10:11
+ */
 @Component
 public class LoginService {
-    private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CacheService cacheService;
     @Autowired
     private SyncService syncService;
     @Autowired
+    private SystemProperties systemProperties;
+    @Autowired
     private WeChatHttpServiceInternal wechatHttpServiceInternal;
-
-    @Value("${jeeves.auto-relogin-when-qrcode-expired}")
-    private boolean AUTO_RELOGIN_WHEN_QRCODE_EXPIRED;
-
-    @Value("${jeeves.max-qr-refresh-times}")
-    private int MAX_QR_REFRESH_TIMES;
 
     private int qrRefreshTimes = 0;
 
@@ -59,7 +61,7 @@ public class LoginService {
             ByteArrayInputStream stream = new ByteArrayInputStream(qrData);
             String qrUrl = QRCodeUtils.decode(stream, uuid);
             stream.close();
-            String qr = QRCodeUtils.generateQR(qrUrl, 10, 10);
+            String qr = QRCodeUtils.generateQR(qrUrl, systemProperties.getIde(), 10, 10);
             logger.info("\r\n" + qr);
             logger.info("[2] qrcode completed");
             wechatHttpServiceInternal.statReport();
@@ -69,10 +71,10 @@ public class LoginService {
                 loginResponse = wechatHttpServiceInternal.login(uuid);
                 if (LoginCode.SUCCESS.getCode().equals(loginResponse.getCode())) {
                     if (loginResponse.getHostUrl() == null) {
-                        throw new WechatException("hostUrl can't be found");
+                        throw new WeChatException("hostUrl can't be found");
                     }
                     if (loginResponse.getRedirectUrl() == null) {
-                        throw new WechatException("redirectUrl can't be found");
+                        throw new WeChatException("redirectUrl can't be found");
                     }
                     cacheService.setHostUrl(loginResponse.getHostUrl());
                     if ("https://wechat.com".equals(loginResponse.getHostUrl())) {
@@ -96,7 +98,7 @@ public class LoginService {
             }
             logger.info("[4] login completed");
             //5 redirect login
-            Token token = wechatHttpServiceInternal.openNewloginpage(loginResponse.getRedirectUrl());
+            Token token = wechatHttpServiceInternal.openNewLoginPage(loginResponse.getRedirectUrl());
             if (token.getRet() == 0) {
                 cacheService.setPassTicket(token.getPass_ticket());
                 cacheService.setsKey(token.getSkey());
@@ -108,7 +110,7 @@ public class LoginService {
                 baseRequest.setSkey(cacheService.getsKey());
                 cacheService.setBaseRequest(baseRequest);
             } else {
-                throw new WechatException("token ret = " + token.getRet());
+                throw new WeChatException("token ret = " + token.getRet());
             }
             logger.info("[5] redirect login completed");
             //6 redirect
@@ -139,6 +141,7 @@ public class LoginService {
                 for (Contact member : members) {
                     cacheService.getAllMembers().put(member.getUserName(), member);
                 }
+                System.out.println(new ObjectMapper().writeValueAsString(members));
                 cacheService.getIndividuals().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isIndividual).collect(Collectors.toSet()));
                 cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WeChatUtils::isMediaPlatform).collect(Collectors.toSet()));
             } while (seq > 0);
@@ -169,14 +172,14 @@ public class LoginService {
                 syncService.listen();
             }
         } catch (IOException | WriterException | URISyntaxException ex) {
-            throw new WechatException(ex);
+            throw new WeChatException(ex);
         } catch (WechatQRExpiredException ex) {
-            if (AUTO_RELOGIN_WHEN_QRCODE_EXPIRED && qrRefreshTimes <= MAX_QR_REFRESH_TIMES) {
+            if (systemProperties.getAutoReLogin() && qrRefreshTimes <= systemProperties.getMaxQrRefreshTimes()) {
                 qrRefreshTimes++;
                 cacheService.reset();
                 loginLoop();
             } else {
-                throw new WechatException(ex);
+                throw new WeChatException(ex);
             }
         }
     }

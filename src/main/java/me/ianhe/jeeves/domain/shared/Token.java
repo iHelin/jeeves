@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 15:22
+ */
 @JacksonXmlRootElement(localName = "error")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Token {
+
     @JacksonXmlProperty(localName = "ret")
     private int ret;
     @JacksonXmlProperty(localName = "message")

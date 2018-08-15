@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:25
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpLogRequest {
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private int CmdId;
     @JsonProperty

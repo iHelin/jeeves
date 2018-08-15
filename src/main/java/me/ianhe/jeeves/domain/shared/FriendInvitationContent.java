@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:38
+ */
 @JacksonXmlRootElement(localName = "msg")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FriendInvitationContent {

@@ -3,10 +3,12 @@ package me.ianhe.jeeves.utils;
 import me.ianhe.jeeves.domain.response.component.AbstractWeChatHttpResponseBase;
 import me.ianhe.jeeves.domain.shared.Contact;
 import me.ianhe.jeeves.domain.shared.Message;
-import me.ianhe.jeeves.exception.WechatException;
+import me.ianhe.jeeves.exception.WeChatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -18,10 +20,12 @@ import java.util.concurrent.TimeUnit;
 public class WeChatUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeChatUtils.class);
+    private static final Random RANDOM = new Random();
+
 
     public static void checkBaseResponse(AbstractWeChatHttpResponseBase response) {
         if (response.getBaseResponse().getRet() != 0) {
-            throw new WechatException(response.getClass().getSimpleName() + " ret = " + response.getBaseResponse().getRet());
+            throw new WeChatException(response.getClass().getSimpleName() + " ret = " + response.getBaseResponse().getRet());
         }
     }
 
@@ -36,7 +40,9 @@ public class WeChatUtils {
         if (contact == null) {
             throw new IllegalArgumentException("contact");
         }
-        return contact.getUserName().startsWith("@") && !contact.getUserName().startsWith("@@") && ((contact.getVerifyFlag() & 8) == 0);
+        return contact.getUserName().startsWith("@")
+                && !contact.getUserName().startsWith("@@")
+                && ((contact.getVerifyFlag() & 8) == 0);
     }
 
     public static boolean isChatRoom(Contact contact) {
@@ -63,8 +69,8 @@ public class WeChatUtils {
         return message.getFromUserName() != null && message.getFromUserName().startsWith("@@");
     }
 
-    public static void sleep(){
-        int rand = 2 + WeChatUtils.random(100, 3000);
+    public static void sleep() {
+        int rand = 2 + random(100, 3000);
         sleep(rand);
     }
 
@@ -82,7 +88,29 @@ public class WeChatUtils {
     }
 
     public static int random(int min, int max) {
-        Random random = new Random();
-        return random.nextInt(max) % (max - min + 1) + min;
+        return RANDOM.nextInt(max) % (max - min + 1) + min;
+    }
+
+    public static int generateDateWithBitwiseNot() {
+        long time = System.currentTimeMillis();
+        return generateDateWithBitwiseNot(time);
+    }
+
+    public static int generateDateWithBitwiseNot(long time) {
+        return -((int) time + 1);
+    }
+
+    /**
+     * 生成deviceID
+     *
+     * @return
+     */
+    public static String generateDeviceId() {
+        long rnd = (long) (RANDOM.nextDouble() * 1e15);
+        return String.format("e%015d", rnd);
+    }
+
+    public static String escape(String str) throws IOException {
+        return URLEncoder.encode(str, StandardCharsets.UTF_8.toString());
     }
 }

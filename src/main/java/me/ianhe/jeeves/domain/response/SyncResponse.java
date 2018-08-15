@@ -13,6 +13,7 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncResponse extends AbstractWeChatHttpResponseBase {
+
     @JsonProperty
     private int AddMsgCount;
     @JsonProperty
@@ -30,15 +31,15 @@ public class SyncResponse extends AbstractWeChatHttpResponseBase {
     @JsonProperty
     private Set<Contact> ModChatRoomMemberList;
     @JsonProperty
-    private me.ianhe.jeeves.domain.shared.Profile Profile;
+    private Profile Profile;
     @JsonProperty
     private int ContinueFlag;
     @JsonProperty
-    private me.ianhe.jeeves.domain.shared.SyncKey SyncKey;
+    private SyncKey SyncKey;
     @JsonProperty
     private String SKey;
     @JsonProperty
-    private me.ianhe.jeeves.domain.shared.SyncCheckKey SyncCheckKey;
+    private SyncCheckKey SyncCheckKey;
 
     public int getAddMsgCount() {
         return AddMsgCount;

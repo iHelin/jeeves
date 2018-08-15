@@ -8,7 +8,7 @@ import me.ianhe.jeeves.domain.shared.*;
 import me.ianhe.jeeves.enums.MessageType;
 import me.ianhe.jeeves.enums.RetCode;
 import me.ianhe.jeeves.enums.Selector;
-import me.ianhe.jeeves.exception.WechatException;
+import me.ianhe.jeeves.exception.WeChatException;
 import me.ianhe.jeeves.utils.WeChatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class SyncService {
                 cacheService.getBaseRequest().getSid(),
                 cacheService.getBaseRequest().getSkey(),
                 cacheService.getSyncKey());
-        int retCode = syncCheckResponse.getRetcode();
+        int retCode = syncCheckResponse.getRetCode();
         int selector = syncCheckResponse.getSelector();
         logger.info("[SYNCCHECK] retCode = {}, selector = {}", retCode, selector);
         if (retCode == RetCode.NORMAL.getCode()) {
@@ -68,10 +68,10 @@ public class SyncService {
                 //do nothing
             } else {
                 logger.error("unknown selector:{}", selector);
-                throw new WechatException("syncCheckResponse selector = " + selector);
+                throw new WeChatException("syncCheckResponse selector = " + selector);
             }
         } else {
-            throw new WechatException("syncCheckResponse ret = " + retCode);
+            throw new WeChatException("syncCheckResponse ret = " + retCode);
         }
     }
 

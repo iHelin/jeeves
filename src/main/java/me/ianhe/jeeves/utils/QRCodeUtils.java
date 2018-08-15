@@ -47,24 +47,32 @@ public class QRCodeUtils {
         }
     }
 
-    public static String generateQR(String text, int width, int height) throws WriterException {
+    public static String generateQR(String text, Boolean ide, int width, int height) throws WriterException {
         Map<EncodeHintType, Object> hintMap = new EnumMap<>(EncodeHintType.class);
         hintMap.put(EncodeHintType.CHARACTER_SET, StandardCharsets.UTF_8);
         hintMap.put(EncodeHintType.MARGIN, 1);
         hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height, hintMap);
-        return toAscii(bitMatrix);
+        return toAscii(bitMatrix, ide);
     }
 
-    private static String toAscii(BitMatrix bitMatrix) {
+    private static String toAscii(BitMatrix bitMatrix, Boolean ide) {
         StringBuilder builder = new StringBuilder();
         for (int r = 0; r < bitMatrix.getHeight(); r++) {
             for (int c = 0; c < bitMatrix.getWidth(); c++) {
-                if (!bitMatrix.get(r, c)) {
-                    builder.append("\033[47m  \033[0m");
+                if (ide) {
+                    if (bitMatrix.get(r, c)) {
+                        builder.append("\033[47m  \033[0m");
+                    } else {
+                        builder.append("\033[40m  \033[0m");
+                    }
                 } else {
-                    builder.append("\033[40m  \033[0m");
+                    if (!bitMatrix.get(r, c)) {
+                        builder.append("\033[47m  \033[0m");
+                    } else {
+                        builder.append("\033[40m  \033[0m");
+                    }
                 }
             }
             builder.append("\n");

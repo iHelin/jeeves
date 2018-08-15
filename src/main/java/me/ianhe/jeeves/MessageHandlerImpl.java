@@ -150,9 +150,4 @@ public class MessageHandlerImpl implements MessageHandler {
         }
     }
 
-    private void replyMessage(Message message) throws IOException {
-        wechatHttpService.sendText(message.getFromUserName(), message.getContent());
-//        wechatHttpService.sendText(message.getFromUserName(), "好");
-    }
-
 }

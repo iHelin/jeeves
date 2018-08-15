@@ -3,6 +3,10 @@ package me.ianhe.jeeves.domain.shared;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author linhe2
+ * @since 2018/8/15 20:33
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatRoomMember {
     @JsonProperty
@@ -127,7 +131,7 @@ public class ChatRoomMember {
 
         ChatRoomMember that = (ChatRoomMember) o;
 
-        return UserName.equals(that.UserName);
+        return getUserName().equals(that.getUserName());
     }
 
     @Override

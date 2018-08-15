@@ -2,7 +2,7 @@ package me.ianhe.jeeves.service;
 
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.shared.*;
-import me.ianhe.jeeves.utils.DeviceIdGenerator;
+import me.ianhe.jeeves.utils.WeChatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +79,7 @@ public class CacheService {
     }
 
     public BaseRequest getBaseRequest() {
-        baseRequest.setDeviceID(DeviceIdGenerator.generate());
+        baseRequest.setDeviceID(WeChatUtils.generateDeviceId());
         return baseRequest;
     }
 
@@ -187,6 +187,15 @@ public class CacheService {
         for (Contact contact : individuals) {
             if (contact.getUserName().equals(userName)) {
                 return StringUtils.isNotEmpty(contact.getRemarkName()) ? contact.getRemarkName() : contact.getNickName();
+            }
+        }
+        return null;
+    }
+
+    public String getUserNameByNickName(String nickName){
+        for (Contact contact : individuals) {
+            if (contact.getNickName().equals(nickName)) {
+                return contact.getUserName();
             }
         }
         return null;

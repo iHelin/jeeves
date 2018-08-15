@@ -6,11 +6,15 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 10:09
+ */
 @Component
 public class CleanupService implements DisposableBean {
 
     @Autowired
-    private WeChatHttpServiceInternal wechatHttpService;
+    private WeChatHttpServiceInternal weChatHttpService;
     @Autowired
     private CacheService cacheService;
 
@@ -22,7 +26,7 @@ public class CleanupService implements DisposableBean {
         if (cacheService.isAlive()) {
             try {
                 logger.warn("[*] logging out");
-                wechatHttpService.logout(cacheService.getHostUrl(), cacheService.getsKey());
+                weChatHttpService.logout(cacheService.getHostUrl(), cacheService.getsKey());
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             }

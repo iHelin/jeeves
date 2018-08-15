@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 10:08
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AddChatRoomMemberRequest {
 
     @JsonProperty
-    private me.ianhe.jeeves.domain.request.component.BaseRequest BaseRequest;
+    private BaseRequest BaseRequest;
     @JsonProperty
     private String ChatRoomName;
     @JsonProperty

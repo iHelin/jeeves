@@ -3,7 +3,6 @@ package me.ianhe.jeeves.domain.response.component;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * @author iHelin
  * @since 2018/8/13 22:19

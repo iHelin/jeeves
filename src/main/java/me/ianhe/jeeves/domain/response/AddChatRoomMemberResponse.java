@@ -7,8 +7,13 @@ import me.ianhe.jeeves.domain.shared.ChatRoomMember;
 
 import java.util.Set;
 
+/**
+ * @author iHelin
+ * @since 2018/8/15 09:00
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AddChatRoomMemberResponse extends AbstractWeChatHttpResponseBase {
+
     @JsonProperty
     private int MemberCount;
     @JsonProperty
