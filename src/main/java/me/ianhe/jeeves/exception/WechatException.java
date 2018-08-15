@@ -1,22 +1,38 @@
 package me.ianhe.jeeves.exception;
 
-public class WechatException extends RuntimeException {
-    public WechatException() {
+/**
+ * @author iHelin
+ * @since 2018/8/15 15:08
+ */
+public class WeChatException extends RuntimeException {
+
+    private Integer errCode;
+
+    public WeChatException() {
     }
 
-    public WechatException(String message) {
+    public WeChatException(String message) {
         super(message);
     }
 
-    public WechatException(String message, Throwable cause) {
+    public WeChatException(String message, Integer errCode) {
+        super(message);
+        this.errCode = errCode;
+    }
+
+    public WeChatException(Integer errCode) {
+        this.errCode = errCode;
+    }
+
+    public WeChatException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public WechatException(Throwable cause) {
+    public WeChatException(Throwable cause) {
         super(cause);
     }
 
-    public WechatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public WeChatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

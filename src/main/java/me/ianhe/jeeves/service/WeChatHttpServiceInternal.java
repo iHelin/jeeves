@@ -431,7 +431,7 @@ class WeChatHttpServiceInternal {
             return null;
         } else {
             SyncCheckResponse result = new SyncCheckResponse();
-            result.setRetCode(Integer.valueOf(matcher.group(1)));
+            result.setRetcode(Integer.valueOf(matcher.group(1)));
             result.setSelector(Integer.valueOf(matcher.group(2)));
             return result;
         }

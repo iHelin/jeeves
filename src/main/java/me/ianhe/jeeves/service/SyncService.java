@@ -49,7 +49,7 @@ public class SyncService {
                 cacheService.getBaseRequest().getSid(),
                 cacheService.getBaseRequest().getSkey(),
                 cacheService.getSyncKey());
-        int retCode = syncCheckResponse.getRetCode();
+        int retCode = syncCheckResponse.getRetcode();
         int selector = syncCheckResponse.getSelector();
         logger.info("[SYNCCHECK] retCode = {}, selector = {}", retCode, selector);
         if (retCode == RetCode.NORMAL.getCode()) {
