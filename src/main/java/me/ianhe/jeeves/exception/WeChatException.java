@@ -7,6 +7,7 @@ package me.ianhe.jeeves.exception;
 public class WeChatException extends RuntimeException {
 
     public WeChatException() {
+
     }
 
     public WeChatException(String message) {
