@@ -6,22 +6,11 @@ package me.ianhe.jeeves.exception;
  */
 public class WeChatException extends RuntimeException {
 
-    private Integer errCode;
-
     public WeChatException() {
     }
 
     public WeChatException(String message) {
         super(message);
-    }
-
-    public WeChatException(String message, Integer errCode) {
-        super(message);
-        this.errCode = errCode;
-    }
-
-    public WeChatException(Integer errCode) {
-        this.errCode = errCode;
     }
 
     public WeChatException(String message, Throwable cause) {
