@@ -46,12 +46,6 @@ public class TaskService {
         daka();
     }
 
-    /**
-     * 每天0点执行
-     *
-     * @author iHelin
-     * @since 2017/12/21 10:21
-     */
     @Scheduled(cron = "0/10 * * * * ?")
     public void runEveryDay0() {
 //        sendMenu();

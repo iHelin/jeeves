@@ -7,7 +7,7 @@ import me.ianhe.jeeves.exception.WeChatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -110,7 +110,12 @@ public class WeChatUtils {
         return String.format("e%015d", rnd);
     }
 
-    public static String escape(String str) throws IOException {
-        return URLEncoder.encode(str, StandardCharsets.UTF_8.toString());
+    public static String escape(String str) {
+        try {
+            return URLEncoder.encode(str, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("error escape str:{}", str, e);
+            return "";
+        }
     }
 }

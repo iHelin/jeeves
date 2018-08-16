@@ -304,7 +304,7 @@ class WeChatHttpServiceInternal {
      * @return current user's information and contact information
      * @throws IOException if the http response body can't be convert to {@link InitResponse}
      */
-    public InitResponse init(String hostUrl, BaseRequest baseRequest) throws IOException {
+    public InitResponse init(String hostUrl, BaseRequest baseRequest) {
         String url = String.format(WECHAT_URL_INIT, hostUrl, WeChatUtils.generateDateWithBitwiseNot(), cacheService.getPassTicket());
         CookieStore store = (CookieStore) ((StatefulRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
         Date maxDate = new Date(Long.MAX_VALUE);
@@ -321,7 +321,13 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), InitResponse.class);
+        InitResponse initResponse;
+        try {
+            initResponse = jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), InitResponse.class);
+            return initResponse;
+        } catch (IOException e) {
+            throw new WeChatException("init failed", e);
+        }
     }
 
     /**
@@ -334,7 +340,7 @@ class WeChatHttpServiceInternal {
      * @return the http response body
      * @throws IOException if the http response body can't be convert to {@link StatusNotifyResponse}
      */
-    public StatusNotifyResponse statusNotify(String hostUrl, BaseRequest baseRequest, String userName, int code) throws IOException {
+    public StatusNotifyResponse statusNotify(String hostUrl, BaseRequest baseRequest, String userName, int code) {
         String rnd = String.valueOf(System.currentTimeMillis());
         final String url = String.format(WECHAT_URL_STATUS_NOTIFY, hostUrl, cacheService.getPassTicket());
         StatusNotifyRequest request = new StatusNotifyRequest();
@@ -349,7 +355,12 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), StatusNotifyResponse.class);
+        try {
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), StatusNotifyResponse.class);
+        } catch (IOException e) {
+            logger.error("notifyNecessary error", e);
+            throw new WeChatException("statusNotify failed", e);
+        }
     }
 
     /**
@@ -361,7 +372,7 @@ class WeChatHttpServiceInternal {
      * @return contact information
      * @throws IOException if the http response body can't be convert to {@link GetContactResponse}
      */
-    public GetContactResponse getContact(String hostUrl, String skey, long seq) throws IOException {
+    public GetContactResponse getContact(String hostUrl, String skey, long seq) {
         long rnd = System.currentTimeMillis();
         final String url = String.format(WECHAT_URL_GET_CONTACT, hostUrl, cacheService.getPassTicket(), rnd, seq, WeChatUtils.escape(skey));
         HttpHeaders customHeader = new HttpHeaders();
@@ -370,7 +381,11 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, baseHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), GetContactResponse.class);
+        try {
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), GetContactResponse.class);
+        } catch (IOException e) {
+            throw new WeChatException("getContact failed", e);
+        }
     }
 
     /**
@@ -382,7 +397,7 @@ class WeChatHttpServiceInternal {
      * @return chatroom members information
      * @throws IOException if the http response body can't be convert to {@link BatchGetContactResponse}
      */
-    public BatchGetContactResponse batchGetContact(String hostUrl, BaseRequest baseRequest, ChatRoomDescription[] list) throws IOException {
+    public BatchGetContactResponse batchGetContact(String hostUrl, BaseRequest baseRequest, ChatRoomDescription[] list) {
         long rnd = System.currentTimeMillis();
         String url = String.format(WECHAT_URL_BATCH_GET_CONTACT, hostUrl, rnd, cacheService.getPassTicket());
         BatchGetContactRequest request = new BatchGetContactRequest();
@@ -393,7 +408,11 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), BatchGetContactResponse.class);
+        try {
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), BatchGetContactResponse.class);
+        } catch (IOException e) {
+            throw new WeChatException("batchGetContact failed", e);
+        }
     }
 
     /**
@@ -408,17 +427,22 @@ class WeChatHttpServiceInternal {
      * @throws IOException        if the http response body can't be convert to {@link SyncCheckResponse}
      * @throws URISyntaxException if url is invalid
      */
-    public SyncCheckResponse syncCheck(String hostUrl, String uin, String sid, String skey, SyncKey syncKey) throws IOException, URISyntaxException {
+    public SyncCheckResponse syncCheck(String hostUrl, String uin, String sid, String skey, SyncKey syncKey) {
         final String path = String.format(WECHAT_URL_SYNC_CHECK, hostUrl);
-        URIBuilder builder = new URIBuilder(path);
-        builder.addParameter("uin", uin);
-        builder.addParameter("sid", sid);
-        builder.addParameter("skey", skey);
-        builder.addParameter("deviceid", WeChatUtils.generateDeviceId());
-        builder.addParameter("synckey", syncKey.toString());
-        builder.addParameter("r", String.valueOf(System.currentTimeMillis()));
-        builder.addParameter("_", String.valueOf(System.currentTimeMillis()));
-        final URI uri = builder.build().toURL().toURI();
+        final URI uri;
+        try {
+            URIBuilder builder = new URIBuilder(path);
+            builder.addParameter("uin", uin);
+            builder.addParameter("sid", sid);
+            builder.addParameter("skey", skey);
+            builder.addParameter("deviceid", WeChatUtils.generateDeviceId());
+            builder.addParameter("synckey", syncKey.toString());
+            builder.addParameter("r", String.valueOf(System.currentTimeMillis()));
+            builder.addParameter("_", String.valueOf(System.currentTimeMillis()));
+            uri = builder.build().toURL().toURI();
+        } catch (Exception e) {
+            throw new WeChatException("syncCheck failed", e);
+        }
         HttpHeaders customHeader = new HttpHeaders();
         customHeader.setAccept(Arrays.asList(MediaType.ALL));
         customHeader.set(HttpHeaders.REFERER, hostUrl + "/");
@@ -446,7 +470,7 @@ class WeChatHttpServiceInternal {
      * @return new messages and contacts
      * @throws IOException if the http response body can't be convert to {@link SyncResponse}
      */
-    public SyncResponse sync(String hostUrl, SyncKey syncKey, BaseRequest baseRequest) throws IOException {
+    public SyncResponse sync(String hostUrl, SyncKey syncKey, BaseRequest baseRequest) {
         final String url = String.format(WECHAT_URL_SYNC, hostUrl, baseRequest.getSid(), WeChatUtils.escape(baseRequest.getSkey()), cacheService.getPassTicket());
         SyncRequest request = new SyncRequest();
         request.setBaseRequest(baseRequest);
@@ -456,10 +480,14 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SyncResponse.class);
+        try {
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SyncResponse.class);
+        } catch (IOException e) {
+            throw new WeChatException("sync failed", e);
+        }
     }
 
-    public VerifyUserResponse acceptFriend(String hostUrl, BaseRequest baseRequest, String passTicket, VerifyUser[] verifyUsers) throws IOException, URISyntaxException {
+    public VerifyUserResponse acceptFriend(String hostUrl, BaseRequest baseRequest, String passTicket, VerifyUser[] verifyUsers) {
         final int opCode = VerifyUserOPCode.VERIFYOK.getCode();
         final int[] sceneList = new int[]{AddScene.WEB.getCode()};
         final String path = String.format(WECHAT_URL_VERIFY_USER, hostUrl);
@@ -472,15 +500,22 @@ class WeChatHttpServiceInternal {
         request.setVerifyContent("");
         request.setVerifyUserList(verifyUsers);
         request.setVerifyUserListSize(verifyUsers.length);
-
-        URIBuilder builder = new URIBuilder(path);
-        builder.addParameter("r", String.valueOf(System.currentTimeMillis()));
-        builder.addParameter("pass_ticket", passTicket);
-        final URI uri = builder.build().toURL().toURI();
-
+        final URI uri;
+        try {
+            URIBuilder builder = new URIBuilder(path);
+            builder.addParameter("r", String.valueOf(System.currentTimeMillis()));
+            builder.addParameter("pass_ticket", passTicket);
+            uri = builder.build().toURL().toURI();
+        } catch (Exception e) {
+            throw new WeChatException("acceptFriend failed", e);
+        }
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(request, this.postHeader), String.class);
-        return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), VerifyUserResponse.class);
+        try {
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), VerifyUserResponse.class);
+        } catch (IOException e) {
+            throw new WeChatException("acceptFriend failed", e);
+        }
     }
 
     public SendMsgResponse sendText(String hostUrl, BaseRequest baseRequest, String content, String fromUserName, String toUserName) {

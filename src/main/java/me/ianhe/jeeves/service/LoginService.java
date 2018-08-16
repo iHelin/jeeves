@@ -148,9 +148,6 @@ public class LoginService {
                         cacheService.getMediaPlatforms().add(member);
                     }
                 }
-//                cacheService.getIndividuals().addAll(members.stream().filter(WeChatUtils::isIndividual).collect(Collectors.toSet()));
-//                cacheService.getChatRooms().addAll(members.stream().filter(WeChatUtils::isChatRoom).collect(Collectors.toSet()));
-//                cacheService.getMediaPlatforms().addAll(members.stream().filter(WeChatUtils::isMediaPlatform).collect(Collectors.toSet()));
             } while (seq > 0);
             logger.info("[9] get contact completed");
             //10 batch get contact

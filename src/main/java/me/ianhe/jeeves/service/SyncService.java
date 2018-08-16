@@ -106,7 +106,7 @@ public class SyncService {
 
     private void onNewMessage() throws IOException, URISyntaxException {
         SyncResponse syncResponse = sync();
-        if (syncResponse.getAddMsgList().length <= 0) {
+        if (syncResponse.getAddMsgCount() <= 0) {
             WeChatUtils.sleep();
         } else {
             for (Message message : syncResponse.getAddMsgList()) {

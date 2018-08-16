@@ -123,19 +123,14 @@ public class WeChatHttpService {
      * notify the server that all the messages in the conversation between {@code userName} and me have been read.
      *
      * @param userName the contact with whom I need to set the messages read.
-     * @throws IOException if statusNotify fails.
      */
     private void notifyNecessary(String userName) {
         if (userName == null) {
-            throw new IllegalArgumentException("userName");
+            throw new IllegalArgumentException("userName is null");
         }
         Set<String> unreadContacts = cacheService.getContactNamesWithUnreadMessage();
         if (unreadContacts.contains(userName)) {
-            try {
-                wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(), cacheService.getBaseRequest(), userName, StatusNotifyCode.READED.getCode());
-            } catch (IOException e) {
-                logger.error("notifyNecessary error", e);
-            }
+            wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(), cacheService.getBaseRequest(), userName, StatusNotifyCode.READED.getCode());
             unreadContacts.remove(userName);
         }
     }
