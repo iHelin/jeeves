@@ -184,7 +184,7 @@ public class LoginService {
             if (systemProperties.getAutoReLogin() && qrRefreshTimes <= systemProperties.getMaxQrRefreshTimes()) {
                 qrRefreshTimes++;
                 cacheService.reset();
-                loginLoop();
+                login();
             } else {
                 throw new WeChatException(ex);
             }

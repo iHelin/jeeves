@@ -176,7 +176,7 @@ class WeChatHttpServiceInternal {
                 return matcher.group(2);
             }
         }
-        throw new WeChatException("uuid can't be found");
+        throw new WeChatException("无法获取uuid");
     }
 
     /**
@@ -198,7 +198,7 @@ class WeChatHttpServiceInternal {
     }
 
     /**
-     * report stats to server
+     * 开始上报stats
      */
     public void statReport() {
         final String url = String.format(WECHAT_URL_STATREPORT, cacheService.getPassTicket());
@@ -218,7 +218,7 @@ class WeChatHttpServiceInternal {
     }
 
     /**
-     * Get hostUrl and redirectUrl
+     * 获取 hostUrl and redirectUrl
      *
      * @param uuid
      * @return hostUrl and redirectUrl
@@ -239,7 +239,7 @@ class WeChatHttpServiceInternal {
         if (matcher.find()) {
             response.setCode(matcher.group(1));
         } else {
-            throw new WeChatException("code can't be found");
+            throw new WeChatException("无法获取code");
         }
         Matcher hostUrlMatcher = PATTERN_HOST_URL.matcher(body);
         if (hostUrlMatcher.find()) {
@@ -269,12 +269,10 @@ class WeChatHttpServiceInternal {
                 = restTemplate.exchange(redirectUrl, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
         String xmlString = responseEntity.getBody();
         ObjectMapper xmlMapper = new XmlMapper();
-        Token token;
         try {
-            token = xmlMapper.readValue(xmlString, Token.class);
-            return token;
+            return xmlMapper.readValue(xmlString, Token.class);
         } catch (IOException e) {
-            throw new WeChatException("openNewLoginPage,解析xml失败", e);
+            throw new WeChatException("openNewLoginPage()，解析xml失败", e);
         }
     }
 
@@ -291,7 +289,6 @@ class WeChatHttpServiceInternal {
         customHeader.set("Upgrade-Insecure-Requests", "1");
         HeaderUtils.assign(customHeader, baseHeader);
         restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
-        //It's now at main page.
         this.originValue = hostUrl;
         this.refererValue = hostUrl + "/";
     }
@@ -321,12 +318,10 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        InitResponse initResponse;
         try {
-            initResponse = jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), InitResponse.class);
-            return initResponse;
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), InitResponse.class);
         } catch (IOException e) {
-            throw new WeChatException("init failed", e);
+            throw new WeChatException("init，解析xml失败", e);
         }
     }
 
@@ -537,13 +532,11 @@ class WeChatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        SendMsgResponse sendMsgResponse = null;
         try {
-            sendMsgResponse = jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
+            return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
         } catch (IOException e) {
-            logger.error("发送消息失败。", e);
+            throw new WeChatException("发送消息失败", e);
         }
-        return sendMsgResponse;
     }
 
     public OpLogResponse setAlias(String hostUrl, BaseRequest baseRequest, String newAlias, String userName) throws IOException {
