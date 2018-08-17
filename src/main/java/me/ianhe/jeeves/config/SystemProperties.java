@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "jeeves")
 public class SystemProperties {
 
-    /**
-     * 七牛存储
-     */
     private String instanceId;
     private Boolean autoReLogin;
     private Integer maxQrRefreshTimes;

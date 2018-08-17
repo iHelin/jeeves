@@ -67,7 +67,6 @@ public class SyncService {
             } else if (selector == Selector.NORMAL.getCode()) {
                 //do nothing
             } else {
-                logger.error("unknown selector:{}", selector);
                 throw new WeChatException("syncCheckResponse selector = " + selector);
             }
         } else {

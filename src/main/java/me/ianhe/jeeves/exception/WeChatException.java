@@ -1,13 +1,12 @@
 package me.ianhe.jeeves.exception;
 
 /**
- * @author linhe2
+ * @author iHelin
  * @since 2018/8/15 23:38
  */
 public class WeChatException extends RuntimeException {
 
     public WeChatException() {
-
     }
 
     public WeChatException(String message) {

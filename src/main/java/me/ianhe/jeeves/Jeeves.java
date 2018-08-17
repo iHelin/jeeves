@@ -1,6 +1,7 @@
 package me.ianhe.jeeves;
 
 import me.ianhe.jeeves.config.SystemProperties;
+import me.ianhe.jeeves.exception.WeChatException;
 import me.ianhe.jeeves.service.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,11 @@ public class Jeeves implements CommandLineRunner {
         logger.debug("app id = {}", systemProperties.getInstanceId());
         System.setProperty("https.protocols", "TLSv1");
         System.setProperty("jsse.enableSNIExtension", "false");
-        loginService.login();
+        try {
+            loginService.login();
+        } catch (WeChatException e) {
+            logger.error("运行异常，{}", e.getMessage());
+        }
     }
 
 }

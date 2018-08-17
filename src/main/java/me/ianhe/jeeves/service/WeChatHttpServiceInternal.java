@@ -358,7 +358,6 @@ class WeChatHttpServiceInternal {
         try {
             return jsonMapper.readValue(WeChatUtils.textDecode(responseEntity.getBody()), StatusNotifyResponse.class);
         } catch (IOException e) {
-            logger.error("notifyNecessary error", e);
             throw new WeChatException("statusNotify failed", e);
         }
     }
