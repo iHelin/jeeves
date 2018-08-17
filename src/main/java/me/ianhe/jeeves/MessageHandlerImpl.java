@@ -3,7 +3,9 @@ package me.ianhe.jeeves;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import me.ianhe.jeeves.config.Constants;
+import me.ianhe.jeeves.dao.WechatMsgMapper;
 import me.ianhe.jeeves.domain.shared.*;
+import me.ianhe.jeeves.entity.WechatMsg;
 import me.ianhe.jeeves.service.CacheService;
 import me.ianhe.jeeves.service.MessageHandler;
 import me.ianhe.jeeves.service.QiniuStoreService;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -37,21 +40,32 @@ public class MessageHandlerImpl implements MessageHandler {
     private QiniuStoreService qiniuStoreService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private WechatMsgMapper wechatMsgMapper;
 
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
-        logger.info("onReceivingChatRoomTextMessage");
-        logger.info("{}:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
-                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
-                MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+        logger.debug("ChatRoom text msg...");
+        WechatMsg msg = new WechatMsg();
+        msg.setDisplayFromName(cacheService.getDisplayChatRoomName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
+        msg.setMsgType(message.getMsgType());
+        msg.setContent(MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+        msg.setCreateTime(new Date(message.getCreateTime() * 1000L));
+        msg.setPrivateMsg(Boolean.FALSE);
+        wechatMsgMapper.insert(msg);
     }
 
     @Override
     public void onReceivingPrivateTextMessage(Message message) {
-        logger.info("onReceivingPrivateTextMessage");
-        logger.info("{}:{}", cacheService.getDisplayUserName(message.getFromUserName()), message.getContent());
-//        将原文回复给对方
-//        replyMessage(message);
+        logger.info("private text msg...");
+        WechatMsg msg = new WechatMsg();
+        msg.setDisplayFromName(cacheService.getDisplayUserName(message.getFromUserName()));
+        msg.setMsgType(message.getMsgType());
+        msg.setContent(message.getContent());
+        msg.setCreateTime(new Date(message.getCreateTime() * 1000L));
+        msg.setPrivateMsg(Boolean.TRUE);
+        wechatMsgMapper.insert(msg);
     }
 
     @Override
@@ -60,19 +74,29 @@ public class MessageHandlerImpl implements MessageHandler {
         logger.info("thumbImageUrl:" + thumbImageUrl);
         logger.info("fullImageUrl:" + fullImageUrl);
         byte[] data = wechatHttpService.downloadImage(fullImageUrl);
-        logger.info("chatroom image:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
-                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
-        qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
-
+        String imgUrl = qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
+        WechatMsg msg = new WechatMsg();
+        msg.setDisplayFromName(cacheService.getDisplayChatRoomName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
+        msg.setMsgType(message.getMsgType());
+        msg.setContent(imgUrl);
+        msg.setCreateTime(new Date(message.getCreateTime() * 1000L));
+        msg.setPrivateMsg(Boolean.FALSE);
+        wechatMsgMapper.insert(msg);
     }
 
     @Override
     public void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) throws IOException {
         logger.info("onReceivingPrivateImageMessage");
-        logger.info("thumbImageUrl:" + thumbImageUrl);
-        logger.info("fullImageUrl:" + fullImageUrl);
         byte[] data = wechatHttpService.downloadImage(fullImageUrl);
-        qiniuStoreService.uploadFile("jeeves/private/" + UUID.randomUUID().toString(), data);
+        String imgUrl = qiniuStoreService.uploadFile("jeeves/private/" + UUID.randomUUID().toString(), data);
+        WechatMsg msg = new WechatMsg();
+        msg.setDisplayFromName(cacheService.getDisplayUserName(message.getFromUserName()));
+        msg.setMsgType(message.getMsgType());
+        msg.setContent(imgUrl);
+        msg.setCreateTime(new Date(message.getCreateTime() * 1000L));
+        msg.setPrivateMsg(Boolean.TRUE);
+        wechatMsgMapper.insert(msg);
     }
 
     @Override

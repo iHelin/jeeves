@@ -1,5 +1,6 @@
 package me.ianhe.jeeves.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import me.ianhe.jeeves.config.SystemProperties;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
@@ -40,6 +41,8 @@ public class LoginService {
     private SystemProperties systemProperties;
     @Autowired
     private WeChatHttpServiceInternal wechatHttpServiceInternal;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private int qrRefreshTimes = 0;
 
