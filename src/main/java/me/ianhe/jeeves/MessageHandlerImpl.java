@@ -8,6 +8,7 @@ import me.ianhe.jeeves.service.CacheService;
 import me.ianhe.jeeves.service.MessageHandler;
 import me.ianhe.jeeves.service.QiniuStoreService;
 import me.ianhe.jeeves.service.WeChatHttpService;
+import me.ianhe.jeeves.utils.DingUtils;
 import me.ianhe.jeeves.utils.MessageUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -167,7 +168,9 @@ public class MessageHandlerImpl implements MessageHandler {
     public void onRedPacketReceived(Contact contact) {
         logger.info("onRedPacketReceived");
         if (contact != null) {
-            logger.info("the red packet is from " + contact.getNickName());
+            DingUtils.send("收到红包啦，红包来自" + contact.getUserName());
+        } else {
+            DingUtils.send("收到红包啦，快去抢啊。");
         }
     }
 
