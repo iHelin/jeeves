@@ -9,10 +9,12 @@ import me.ianhe.jeeves.service.MessageHandler;
 import me.ianhe.jeeves.service.QiniuStoreService;
 import me.ianhe.jeeves.service.WeChatHttpService;
 import me.ianhe.jeeves.utils.MessageUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -37,42 +39,58 @@ public class MessageHandlerImpl implements MessageHandler {
     private QiniuStoreService qiniuStoreService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
-        logger.info("onReceivingChatRoomTextMessage");
-        logger.info("{}:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
-                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
-                MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+        try {
+            logger.info("onReceivingChatRoomTextMessage");
+            logger.info("{}:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
+                    MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
+                    MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+        } catch (Exception e) {
+            logger.error("onReceivingChatRoomTextMessage error.", e);
+        }
     }
 
     @Override
     public void onReceivingPrivateTextMessage(Message message) {
-        logger.info("onReceivingPrivateTextMessage");
-        logger.info("{}:{}", cacheService.getDisplayUserName(message.getFromUserName()), message.getContent());
-//        将原文回复给对方
-//        replyMessage(message);
+        try {
+            logger.info("onReceivingPrivateTextMessage");
+            logger.info("{}:{}", cacheService.getDisplayUserName(message.getFromUserName()), message.getContent());
+        } catch (Exception e) {
+            logger.error("onReceivingPrivateTextMessage error.", e);
+        }
     }
 
     @Override
     public void onReceivingChatRoomImageMessage(Message message, String thumbImageUrl, String fullImageUrl) {
-        logger.info("onReceivingChatRoomImageMessage");
-        logger.info("thumbImageUrl:" + thumbImageUrl);
-        logger.info("fullImageUrl:" + fullImageUrl);
-        byte[] data = wechatHttpService.downloadImage(fullImageUrl);
-        logger.info("chatroom image:{}", cacheService.getDisplayChatRoomName(message.getFromUserName(),
-                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
-        qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
+        try {
+            logger.info("onReceivingChatRoomImageMessage");
+            logger.info("thumbImageUrl:" + thumbImageUrl);
+            logger.info("fullImageUrl:" + fullImageUrl);
+            byte[] data = wechatHttpService.downloadImage(fullImageUrl);
+            logger.info("chatroom image:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
+                    MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
+            qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
+        } catch (Exception e) {
+            logger.error("onReceivingChatRoomImageMessage error.", e);
+        }
 
     }
 
     @Override
     public void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) throws IOException {
-        logger.info("onReceivingPrivateImageMessage");
-        logger.info("thumbImageUrl:" + thumbImageUrl);
-        logger.info("fullImageUrl:" + fullImageUrl);
-        byte[] data = wechatHttpService.downloadImage(fullImageUrl);
-        qiniuStoreService.uploadFile("jeeves/private/" + UUID.randomUUID().toString(), data);
+        try {
+            logger.info("onReceivingPrivateImageMessage");
+            logger.info("thumbImageUrl:" + thumbImageUrl);
+            logger.info("fullImageUrl:" + fullImageUrl);
+            byte[] data = wechatHttpService.downloadImage(fullImageUrl);
+            qiniuStoreService.uploadFile("jeeves/private/" + UUID.randomUUID().toString(), data);
+        } catch (Exception e) {
+            logger.error("onReceivingPrivateImageMessage error.", e);
+        }
     }
 
     @Override
@@ -155,15 +173,28 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public void onReceiveAppMsg(Message message) {
-        logger.info(message.getFileName());
-        Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
-        if (matcher.find()) {
-            logger.info("{},{}", matcher.group(1), matcher.group(2));
-            String userName = cacheService.getUserNameByNickName(Constants.DEST_CHATROOM_NAME);
-            wechatHttpService.sendText(userName, "骚年，加油哦！");
+        try {
+            logger.info(message.getFileName());
+            Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
+            if (matcher.find()) {
+                Long userMaxDays = Long.valueOf(matcher.group(1));
+                String maxDaysStr = redisTemplate.opsForValue().get("jeeves:maxDays");
+                Long maxDays = 0L;
+                if (StringUtils.isNotEmpty(maxDaysStr)) {
+                    maxDays = Long.valueOf(maxDaysStr);
+                }
+                String destUserName = cacheService.getUserNameByNickName(Constants.CHATROOM_NAME_STUDY);
+                if (userMaxDays > maxDays) {
+                    redisTemplate.opsForValue().set("jeeves:maxDays", String.valueOf(userMaxDays));
+                    redisTemplate.opsForValue().set("jeeves:maxDaysUserName", cacheService.getDisplayUserName(MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
+                    wechatHttpService.sendText(destUserName, "恭喜你，目前你是第一名，继续加油。");
+                } else {
+                    String maxDaysUserName = redisTemplate.opsForValue().get("jeeves:maxDaysUserName");
+                    wechatHttpService.sendText(destUserName, "目前第一名是" + maxDaysUserName + "，一共坚持了" + maxDaysStr + "天，骚年，要加油哦！");
+                }
+            }
+        } catch (Exception e) {
+            logger.error("onReceiveAppMsg error.", e);
         }
-        logger.info(cacheService.getDisplayChatRoomName(message.getFromUserName(), MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
-        logger.info(StringEscapeUtils.unescapeXml(message.getContent()));
-        logger.info(message.getUrl());
     }
 }

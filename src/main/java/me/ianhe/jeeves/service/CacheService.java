@@ -181,9 +181,18 @@ public class CacheService {
     }
 
     public String getDisplayUserName(String userName) {
-        for (Contact contact : individuals) {
+        for (Contact contact : allMembers) {
             if (contact.getUserName().equals(userName)) {
                 return StringUtils.isNotEmpty(contact.getRemarkName()) ? contact.getRemarkName() : contact.getNickName();
+            }
+        }
+        return null;
+    }
+
+    public String getNickName(String userName) {
+        for (Contact contact : allMembers) {
+            if (contact.getUserName().equals(userName)) {
+                return contact.getNickName();
             }
         }
         return null;
@@ -198,16 +207,7 @@ public class CacheService {
         return null;
     }
 
-    public String getDisplayChatRoomName(String chatRoomName) {
-        for (Contact contact : chatRooms) {
-            if (contact.getUserName().equals(chatRoomName)) {
-                return contact.getNickName();
-            }
-        }
-        return null;
-    }
-
-    public String getDisplayChatRoomName(String chatRoomName, String userName) {
+    public String getDisplayChatRoomMemberName(String chatRoomName, String userName) {
         for (Contact contact : chatRooms) {
             if (contact.getUserName().equals(chatRoomName)) {
                 Set<ChatRoomMember> memberList = contact.getMemberList();

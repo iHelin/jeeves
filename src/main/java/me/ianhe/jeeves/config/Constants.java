@@ -13,6 +13,7 @@ public class Constants {
     public static final String SUCCESS_CODE = "200";
     public final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
     public final static String BAI_CI_ZHAN = "我已经在百词斩上坚持了(\\d+)天，今日过招(\\d+)个单词。";
-    public final static String DEST_CHATROOM_NAME = "葫芦娃打卡";
+    public final static String CHATROOM_NAME_SEVEN = "葫芦娃打卡";
+    public final static String CHATROOM_NAME_STUDY = "好好学习 天天向上";
 
 }

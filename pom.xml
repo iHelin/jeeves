@@ -26,6 +26,10 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
         <!-- 七牛云存储 -->
         <dependency>
             <groupId>com.qiniu</groupId>
