@@ -37,7 +37,4 @@ public class DingUtils {
         restTemplate.postForObject(URL, new HttpEntity<>(data, customHeader), HashMap.class);
     }
 
-    public static void main(String[] args) {
-        send("你才是");
-    }
 }

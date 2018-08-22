@@ -1,4 +1,4 @@
-package me.ianhe.jeeves.utils.rest;
+package me.ianhe.jeeves.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

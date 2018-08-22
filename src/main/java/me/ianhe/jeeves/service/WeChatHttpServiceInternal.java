@@ -3,6 +3,7 @@ package me.ianhe.jeeves.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import me.ianhe.jeeves.config.Constants;
+import me.ianhe.jeeves.config.StatefulRestTemplate;
 import me.ianhe.jeeves.domain.request.*;
 import me.ianhe.jeeves.domain.request.component.BaseRequest;
 import me.ianhe.jeeves.domain.response.*;
@@ -11,7 +12,6 @@ import me.ianhe.jeeves.enums.*;
 import me.ianhe.jeeves.exception.WeChatException;
 import me.ianhe.jeeves.utils.HeaderUtils;
 import me.ianhe.jeeves.utils.WeChatUtils;
-import me.ianhe.jeeves.utils.rest.StatefulRestTemplate;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
@@ -140,7 +140,7 @@ class WeChatHttpServiceInternal {
         customHeader.setAccept(MediaType.parseMediaTypes(Constants.HEADER_ACCEPT));
         HeaderUtils.assign(customHeader, baseHeader);
         restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
-        CookieStore store = (CookieStore) ((StatefulRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
+        CookieStore cookieStore = (CookieStore) ((StatefulRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
         Date maxDate = new Date(Long.MAX_VALUE);
         String domain = WECHAT_URL_ENTRY.replaceAll("https://", "").replaceAll("/", "");
         Map<String, String> cookies = new HashMap<>(3);
@@ -149,7 +149,7 @@ class WeChatHttpServiceInternal {
         if (retryTimes > 0) {
             cookies.put("refreshTimes", String.valueOf(retryTimes));
         }
-        appendAdditionalCookies(store, cookies, domain, "/", maxDate);
+        appendAdditionalCookies(cookieStore, cookies, domain, "/", maxDate);
         this.originValue = WECHAT_URL_ENTRY;
         this.refererValue = WECHAT_URL_ENTRY.replaceAll("/$", "");
     }
@@ -303,13 +303,13 @@ class WeChatHttpServiceInternal {
      */
     public InitResponse init(String hostUrl, BaseRequest baseRequest) {
         String url = String.format(WECHAT_URL_INIT, hostUrl, WeChatUtils.generateDateWithBitwiseNot(), cacheService.getPassTicket());
-        CookieStore store = (CookieStore) ((StatefulRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
+        CookieStore cookieStore = (CookieStore) ((StatefulRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
         Date maxDate = new Date(Long.MAX_VALUE);
         String domain = hostUrl.replaceAll("https://", "").replaceAll("/", "");
         Map<String, String> cookies = new HashMap<>(3);
         cookies.put("MM_WX_NOTIFY_STATE", "1");
         cookies.put("MM_WX_SOUND_STATE", "1");
-        appendAdditionalCookies(store, cookies, domain, "/", maxDate);
+        appendAdditionalCookies(cookieStore, cookies, domain, "/", maxDate);
         InitRequest request = new InitRequest();
         request.setBaseRequest(baseRequest);
         HttpHeaders customHeader = new HttpHeaders();

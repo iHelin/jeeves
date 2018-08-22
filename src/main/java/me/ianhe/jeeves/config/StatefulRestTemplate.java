@@ -1,4 +1,4 @@
-package me.ianhe.jeeves.utils.rest;
+package me.ianhe.jeeves.config;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
