@@ -17,7 +17,6 @@ import me.ianhe.jeeves.utils.WeChatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -44,13 +43,10 @@ public class LoginService {
     private WeChatHttpServiceInternal wechatHttpServiceInternal;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
     private int qrRefreshTimes = 0;
 
     public void login() {
-        redisTemplate.opsForValue().set("jeeves:alive", "false");
         wechatHttpServiceInternal.open(qrRefreshTimes);
         logger.debug("[0] entry completed");
         cacheService.reset();
@@ -180,7 +176,7 @@ public class LoginService {
             }
             logger.debug("[10] batch get contact completed");
             cacheService.setAlive(true);
-            redisTemplate.opsForValue().set("jeeves:alive", "true");
+//            redisTemplate.opsForValue().set("jeeves:alive", "true");
             logger.debug("[*] login process completed");
             logger.debug("[*] start listening");
             while (true) {

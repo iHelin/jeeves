@@ -2,7 +2,6 @@ package me.ianhe.jeeves;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import me.ianhe.jeeves.config.Constants;
 import me.ianhe.jeeves.domain.shared.*;
 import me.ianhe.jeeves.service.CacheService;
 import me.ianhe.jeeves.service.MessageHandler;
@@ -10,19 +9,15 @@ import me.ianhe.jeeves.service.QiniuStoreService;
 import me.ianhe.jeeves.service.WeChatHttpService;
 import me.ianhe.jeeves.utils.DingUtils;
 import me.ianhe.jeeves.utils.MessageUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -40,8 +35,6 @@ public class MessageHandlerImpl implements MessageHandler {
     private QiniuStoreService qiniuStoreService;
     @Autowired
     private CacheService cacheService;
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
@@ -178,24 +171,24 @@ public class MessageHandlerImpl implements MessageHandler {
     public void onReceiveAppMsg(Message message) {
         try {
             logger.info(message.getFileName());
-            Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
-            if (matcher.find()) {
-                Long userMaxDays = Long.valueOf(matcher.group(1));
-                String maxDaysStr = redisTemplate.opsForValue().get("jeeves:maxDays");
-                Long maxDays = 0L;
-                if (StringUtils.isNotEmpty(maxDaysStr)) {
-                    maxDays = Long.valueOf(maxDaysStr);
-                }
-                String destUserName = cacheService.getUserNameByNickName(Constants.CHATROOM_NAME_STUDY);
-                if (userMaxDays > maxDays) {
-                    redisTemplate.opsForValue().set("jeeves:maxDays", String.valueOf(userMaxDays));
-                    redisTemplate.opsForValue().set("jeeves:maxDaysUserName", cacheService.getDisplayUserName(MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
-                    wechatHttpService.sendText(destUserName, "恭喜你，目前你是第一名，继续加油。");
-                } else {
-                    String maxDaysUserName = redisTemplate.opsForValue().get("jeeves:maxDaysUserName");
-                    wechatHttpService.sendText(destUserName, "目前第一名是" + maxDaysUserName + "，一共坚持了" + maxDaysStr + "天，骚年，要加油哦！");
-                }
-            }
+//            Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
+//            if (matcher.find()) {
+//                Long userMaxDays = Long.valueOf(matcher.group(1));
+//                String maxDaysStr = redisTemplate.opsForValue().get("jeeves:maxDays");
+//                Long maxDays = 0L;
+//                if (StringUtils.isNotEmpty(maxDaysStr)) {
+//                    maxDays = Long.valueOf(maxDaysStr);
+//                }
+//                String destUserName = cacheService.getUserNameByNickName(Constants.CHATROOM_NAME_STUDY);
+//                if (userMaxDays > maxDays) {
+//                    redisTemplate.opsForValue().set("jeeves:maxDays", String.valueOf(userMaxDays));
+//                    redisTemplate.opsForValue().set("jeeves:maxDaysUserName", cacheService.getDisplayUserName(MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
+//                    wechatHttpService.sendText(destUserName, "恭喜你，目前你是第一名，继续加油。");
+//                } else {
+//                    String maxDaysUserName = redisTemplate.opsForValue().get("jeeves:maxDaysUserName");
+//                    wechatHttpService.sendText(destUserName, "目前第一名是" + maxDaysUserName + "，一共坚持了" + maxDaysStr + "天，骚年，要加油哦！");
+//                }
+//            }
         } catch (Exception e) {
             logger.error("onReceiveAppMsg error.", e);
         }
