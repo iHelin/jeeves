@@ -7,7 +7,6 @@ import me.ianhe.jeeves.service.CacheService;
 import me.ianhe.jeeves.service.MessageHandler;
 import me.ianhe.jeeves.service.QiniuStoreService;
 import me.ianhe.jeeves.service.WeChatHttpService;
-import me.ianhe.jeeves.utils.DingUtils;
 import me.ianhe.jeeves.utils.MessageUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -39,19 +38,34 @@ public class MessageHandlerImpl implements MessageHandler {
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
         try {
-            logger.info("onReceivingChatRoomTextMessage");
+            logger.info("群聊文本消息");
             logger.info("{}:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
-                    MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
-                    MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
+                MessageUtils.getChatRoomTextMessageContent(message.getContent()));
         } catch (Exception e) {
             logger.error("onReceivingChatRoomTextMessage error.", e);
         }
     }
 
     @Override
+    public void onReceivingChatRoomImageMessage(Message message, String thumbImageUrl, String fullImageUrl) {
+        try {
+            logger.info("群聊图片消息");
+            logger.info("thumbImageUrl:" + thumbImageUrl);
+            logger.info("fullImageUrl:" + fullImageUrl);
+            byte[] data = wechatHttpService.downloadImage(fullImageUrl);
+            logger.info("chatroom image:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
+            qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
+        } catch (Exception e) {
+            logger.error("onReceivingChatRoomImageMessage error.", e);
+        }
+    }
+
+    @Override
     public void onReceivingPrivateTextMessage(Message message) {
         try {
-            logger.info("onReceivingPrivateTextMessage");
+            logger.info("私聊文本消息");
             logger.info("{}:{}", cacheService.getDisplayUserName(message.getFromUserName()), message.getContent());
         } catch (Exception e) {
             logger.error("onReceivingPrivateTextMessage error.", e);
@@ -59,25 +73,9 @@ public class MessageHandlerImpl implements MessageHandler {
     }
 
     @Override
-    public void onReceivingChatRoomImageMessage(Message message, String thumbImageUrl, String fullImageUrl) {
-        try {
-            logger.info("onReceivingChatRoomImageMessage");
-            logger.info("thumbImageUrl:" + thumbImageUrl);
-            logger.info("fullImageUrl:" + fullImageUrl);
-            byte[] data = wechatHttpService.downloadImage(fullImageUrl);
-            logger.info("chatroom image:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
-                    MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + "/");
-            qiniuStoreService.uploadFile("jeeves/chatroom/" + UUID.randomUUID().toString(), data);
-        } catch (Exception e) {
-            logger.error("onReceivingChatRoomImageMessage error.", e);
-        }
-
-    }
-
-    @Override
     public void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) throws IOException {
         try {
-            logger.info("onReceivingPrivateImageMessage");
+            logger.info("私聊图片消息");
             logger.info("thumbImageUrl:" + thumbImageUrl);
             logger.info("fullImageUrl:" + fullImageUrl);
             byte[] data = wechatHttpService.downloadImage(fullImageUrl);
@@ -89,7 +87,7 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public boolean onReceivingFriendInvitation(RecommendInfo info) {
-        logger.info("onReceivingFriendInvitation");
+        logger.info("收到加好友邀请");
         logger.info("recommendinfo content:" + info.getContent());
 //        默认接收所有的邀请
         return true;
@@ -97,7 +95,7 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public void postAcceptFriendInvitation(Message message) throws IOException {
-        logger.info("postAcceptFriendInvitation");
+        logger.info("接受好友邀请成功");
 //        将该用户的微信号设置成他的昵称
         String content = StringEscapeUtils.unescapeXml(message.getContent());
         ObjectMapper xmlMapper = new XmlMapper();
@@ -107,7 +105,7 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public void onChatRoomMembersChanged(Contact chatRoom, Set<ChatRoomMember> membersJoined, Set<ChatRoomMember> membersLeft) {
-        logger.info("onChatRoomMembersChanged");
+        logger.debug("群成员发生变化");
         logger.info("chatRoom:" + chatRoom.getUserName());
         if (membersJoined != null && membersJoined.size() > 0) {
             logger.info("membersJoined:" + String.join(",", membersJoined.stream().map(ChatRoomMember::getNickName).collect(Collectors.toList())));
@@ -119,19 +117,19 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public void onNewChatRoomsFound(Set<Contact> chatRooms) {
-        logger.info("onNewChatRoomsFound");
+        logger.debug("发现新增群");
         chatRooms.forEach(x -> logger.info(x.getUserName()));
     }
 
     @Override
     public void onChatRoomsDeleted(Set<Contact> chatRooms) {
-        logger.info("onChatRoomsDeleted");
+        logger.debug("发现群减少");
         chatRooms.forEach(x -> logger.info(x.getUserName()));
     }
 
     @Override
     public void onNewFriendsFound(Set<Contact> contacts) {
-        logger.info("onNewFriendsFound");
+        logger.debug("发现新的好友");
         contacts.forEach(x -> {
             logger.info(x.getUserName());
             logger.info(x.getNickName());
@@ -159,38 +157,9 @@ public class MessageHandlerImpl implements MessageHandler {
 
     @Override
     public void onRedPacketReceived(Contact contact) {
-        logger.info("onRedPacketReceived");
-        if (contact != null) {
-            DingUtils.send("收到红包啦，红包来自" + contact.getUserName());
-        } else {
-            DingUtils.send("收到红包啦，快去抢啊。");
-        }
+        logger.info("收到红包啦");
+        logger.info("收到红包啦");
+        logger.info("收到红包啦");
     }
 
-    @Override
-    public void onReceiveAppMsg(Message message) {
-        try {
-            logger.info(message.getFileName());
-//            Matcher matcher = Pattern.compile(Constants.BAI_CI_ZHAN).matcher(message.getFileName());
-//            if (matcher.find()) {
-//                Long userMaxDays = Long.valueOf(matcher.group(1));
-//                String maxDaysStr = redisTemplate.opsForValue().get("jeeves:maxDays");
-//                Long maxDays = 0L;
-//                if (StringUtils.isNotEmpty(maxDaysStr)) {
-//                    maxDays = Long.valueOf(maxDaysStr);
-//                }
-//                String destUserName = cacheService.getUserNameByNickName(Constants.CHATROOM_NAME_STUDY);
-//                if (userMaxDays > maxDays) {
-//                    redisTemplate.opsForValue().set("jeeves:maxDays", String.valueOf(userMaxDays));
-//                    redisTemplate.opsForValue().set("jeeves:maxDaysUserName", cacheService.getDisplayUserName(MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())));
-//                    wechatHttpService.sendText(destUserName, "恭喜你，目前你是第一名，继续加油。");
-//                } else {
-//                    String maxDaysUserName = redisTemplate.opsForValue().get("jeeves:maxDaysUserName");
-//                    wechatHttpService.sendText(destUserName, "目前第一名是" + maxDaysUserName + "，一共坚持了" + maxDaysStr + "天，骚年，要加油哦！");
-//                }
-//            }
-        } catch (Exception e) {
-            logger.error("onReceiveAppMsg error.", e);
-        }
-    }
 }

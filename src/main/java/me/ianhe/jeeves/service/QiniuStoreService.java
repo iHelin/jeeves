@@ -23,7 +23,7 @@ import java.io.InputStream;
 @Service
 public class QiniuStoreService {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Configuration configuration;
     private Auth auth;
 
@@ -71,7 +71,7 @@ public class QiniuStoreService {
         String token = auth.uploadToken(systemProperties.getQnBucket());
         try {
             Response res = uploadManager.put(bytes, key, token);
-            logger.info("upload file {} to qiniu oss,result:{}", key, res.isOK());
+            logger.debug("upload file {} to qiniu oss,result:{}", key, res.isOK());
             return systemProperties.getQnPrefix() + key;
         } catch (QiniuException e) {
             logger.error("error upload file to qiniu ！", e);

@@ -21,6 +21,7 @@ import java.net.URI;
  * @since 2018/8/13 20:54
  */
 public class StatefulRestTemplate extends RestTemplate {
+
     private final HttpContext httpContext = new BasicHttpContext();
 
     StatefulRestTemplate() {
@@ -38,7 +39,7 @@ public class StatefulRestTemplate extends RestTemplate {
         return httpContext;
     }
 
-    class StatefulHttpComponentsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
+    static class StatefulHttpComponentsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
         private final HttpContext httpContext;
 
         StatefulHttpComponentsClientHttpRequestFactory(HttpClient httpClient, HttpContext httpContext) {

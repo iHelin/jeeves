@@ -22,7 +22,7 @@ public class Jeeves implements CommandLineRunner {
     @Autowired
     private SystemProperties systemProperties;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void run(String... strings) throws Exception {

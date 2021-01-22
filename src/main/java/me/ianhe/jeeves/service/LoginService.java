@@ -176,7 +176,6 @@ public class LoginService {
             }
             logger.debug("[10] batch get contact completed");
             cacheService.setAlive(true);
-//            redisTemplate.opsForValue().set("jeeves:alive", "true");
             logger.debug("[*] login process completed");
             logger.debug("[*] start listening");
             while (true) {
