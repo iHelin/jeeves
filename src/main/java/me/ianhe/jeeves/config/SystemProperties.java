@@ -21,6 +21,8 @@ public class SystemProperties {
     private String qnBucket;
     private Boolean ide;
 
+    private Ding ding;
+
     public String getInstanceId() {
         return instanceId;
     }
@@ -83,5 +85,13 @@ public class SystemProperties {
 
     public void setIde(Boolean ide) {
         this.ide = ide;
+    }
+
+    public Ding getDing() {
+        return ding;
+    }
+
+    public void setDing(Ding ding) {
+        this.ding = ding;
     }
 }

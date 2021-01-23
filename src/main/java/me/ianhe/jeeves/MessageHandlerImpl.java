@@ -3,10 +3,7 @@ package me.ianhe.jeeves;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import me.ianhe.jeeves.domain.shared.*;
-import me.ianhe.jeeves.service.CacheService;
-import me.ianhe.jeeves.service.MessageHandler;
-import me.ianhe.jeeves.service.QiniuStoreService;
-import me.ianhe.jeeves.service.WeChatHttpService;
+import me.ianhe.jeeves.service.*;
 import me.ianhe.jeeves.utils.MessageUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -34,6 +31,8 @@ public class MessageHandlerImpl implements MessageHandler {
     private QiniuStoreService qiniuStoreService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private DingService dingService;
 
     @Override
     public void onReceivingChatRoomTextMessage(Message message) {
@@ -41,6 +40,9 @@ public class MessageHandlerImpl implements MessageHandler {
             logger.info("群聊文本消息");
             logger.info("{}:{}", cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
                 MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())),
+                MessageUtils.getChatRoomTextMessageContent(message.getContent()));
+            dingService.sendTextMsg(cacheService.getDisplayChatRoomMemberName(message.getFromUserName(),
+                MessageUtils.getSenderOfChatRoomTextMessage(message.getContent())) + ":" +
                 MessageUtils.getChatRoomTextMessageContent(message.getContent()));
         } catch (Exception e) {
             logger.error("onReceivingChatRoomTextMessage error.", e);
